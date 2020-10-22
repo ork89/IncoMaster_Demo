@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcService.Protos";
+
+package user;
+
+message User {
+	string id = 1;
+	string fName = 2;
+	string lName = 3;
+}
+
+service UserManagementService {
+	rpc AddNewUserToDB (AddNewUserRequest) returns (AddNewUserResponse){};
+
+	rpc GetUsersFromDB (GetUsersRequest) returns ( stream GetUsersResponse){};
+}
+
+message AddNewUserRequest {
+	User newUser = 1;
+}
+
+message AddNewUserResponse {
+	User newUser = 1;
+}
+
+message GetUsersRequest {
+}
+
+message GetUsersResponse {
+	User user = 1;
+}
