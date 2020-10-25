@@ -1,9 +1,6 @@
-﻿using IncoMasterApp.ViewModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,17 +11,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace IncoMasterApp
+namespace IncoMasterApp.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for IncomeControl.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class IncomeView : UserControl
     {
-        public MainWindow()
+        public IncomeView()
         {
             InitializeComponent();
-            this.DataContext = new MainWindowViewModel();
         }
     }
 }

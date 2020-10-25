@@ -3,9 +3,8 @@ using Grpc.Core;
 using MongoDB.Driver;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
-using GrpcService;
 using Microsoft.Extensions.Logging;
-using GrpcService.Protos;
+using GrpcService.Common;
 
 namespace gRPC.GrpcService.Services
 {
@@ -40,10 +39,12 @@ namespace gRPC.GrpcService.Services
 
         private User AddNewUser(User user)
         {
-            //TODO: Change to dictionaty to insert all the relavent fileds for the User document.
+            //TODO: Change to dictionary to insert all the relavent fileds for the User document.
             BsonDocument doc = new BsonDocument("UserId", user.Id)
+                                                .Add("AccountType", user.AccountType)
                                                 .Add("FirstName", user.FName)
-                                                .Add("LastName", user.LName);
+                                                .Add("LastName", user.LName)
+                                                .Add("Balance", user.Balance);
             mongoCollection.InsertOne(doc);
 
             var id = doc.GetValue("_id").ToString();
@@ -66,8 +67,10 @@ namespace gRPC.GrpcService.Services
                     User = new User
                     {
                         Id = user.GetValue("_id").ToString(),
+                        AccountType = user.GetValue("AccountType").ToString(),
                         FName = user.GetValue("FirstName").ToString(),
                         LName = user.GetValue("LastName").ToString(),
+                        Balance = (double)user.GetValue("Balance"),
                     }
                 });
                 count++;

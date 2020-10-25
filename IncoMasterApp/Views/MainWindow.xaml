@@ -4,9 +4,33 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:in="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:cmd="http://www.galasoft.ch/mvvmlight"
+        xmlns:cmd1="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras"
         xmlns:local="clr-namespace:IncoMasterApp"
+        xmlns:views="clr-namespace:IncoMasterApp.Views"
+        xmlns:viewModels="clr-namespace:IncoMasterApp.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="750" Width="1000">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewModels:HomeViewModel}">
+            <views:HomeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:IncomeViewModel}">
+            <views:IncomeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ExpensesViewModel}">
+            <views:ExpensesView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:SavingsViewModel}">
+            <views:SavingsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:LoansViewModel}">
+            <views:LoansView />
+        </DataTemplate>
+    </Window.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -37,10 +61,29 @@
         </Grid.RowDefinitions>
         <!-- // Top Panel // -->
         <Grid x:Name="TopMenu" Grid.Row="0" Grid.Column="10" Grid.ColumnSpan="2">
-            <Button x:Name="UserBtn" Grid.Column="11" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20 0" Background="{x:Null}" BorderBrush="{x:Null}" Width="30" Height="30" Padding="0">
+            <Button x:Name="UserBtn" 
+                    Grid.Column="11" 
+                    HorizontalAlignment="Right" 
+                    VerticalAlignment="Top" 
+                    Command="{Binding switchToIncomeViewCommand}" 
+                    Background="{x:Null}" 
+                    BorderBrush="{x:Null}" 
+                    Margin="20 0"
+                    Width="30" 
+                    Height="30" 
+                    Padding="0">
                 <materialDesign:PackIcon Kind="UserOutline" Foreground="#FF28965A" Width="20" Height="20" />
             </Button>
-            <Button x:Name="SettingsBtn" Grid.Column="11" HorizontalAlignment="Center" VerticalAlignment="Top" Background="{x:Null}" BorderBrush="{x:Null}" Width="30" Height="30" Padding="0">
+            <Button x:Name="SettingsBtn"
+                    Grid.Column="11" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Top" 
+                    Command="{Binding switchToExpensesViewCommand}" 
+                    Background="{x:Null}" 
+                    BorderBrush="{x:Null}" 
+                    Width="30"
+                    Height="30" 
+                    Padding="0">
                 <materialDesign:PackIcon Kind="Settings" Foreground="#FF28965A" Width="20" Height="20" />
             </Button>
         </Grid>
@@ -48,42 +91,110 @@
         <!-- // Side Menu // -->
         <Grid x:Name="Menu" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="10" Background="#242331">
             <StackPanel VerticalAlignment="Center">
-                <ListView Foreground="#6BFFB8" FontFamily="Champagne &amp; Limousines" FontSize="20">
-                    <ListViewItem Height="45" Padding="0">
-                        <StackPanel Orientation="Horizontal" Margin="10 0">
-                            <materialDesign:PackIcon Kind="Home" Foreground="White" Width="20" Height="20" Margin="5" VerticalAlignment="Center" />
-                            <TextBlock Text="Home" Margin="10" />
-                        </StackPanel>
-                    </ListViewItem>
-                    <ListViewItem Height="45" Padding="0">
-                        <StackPanel Orientation="Horizontal" Margin="10 0">
-                            <materialDesign:PackIcon Kind="Dollar" Foreground="White" Width="20" Height="20" Margin="5" VerticalAlignment="Center" />
-                            <TextBlock Text="Income" Margin="10" />
-                        </StackPanel>
-                    </ListViewItem>
-                    <ListViewItem Height="45" Padding="0">
-                        <StackPanel Orientation="Horizontal" Margin="10 0">
-                            <materialDesign:PackIcon Kind="Home" Foreground="White" Width="20" Height="20" Margin="5" VerticalAlignment="Center" />
-                            <TextBlock Text="Expenses" Margin="10" />
-                        </StackPanel>
-                    </ListViewItem>
-                    <ListViewItem Height="45" Padding="0">
-                        <StackPanel Orientation="Horizontal" Margin="10 0">
-                            <materialDesign:PackIcon Kind="PiggyBank" Foreground="White" Width="20" Height="20" Margin="5" VerticalAlignment="Center" />
-                            <TextBlock Text="Savings" Margin="10" />
-                        </StackPanel>
-                    </ListViewItem>
-                    <ListViewItem Height="45" Padding="0">
-                        <StackPanel Orientation="Horizontal" Margin="10 0">
-                            <materialDesign:PackIcon Kind="ArchiveArrowDown" Foreground="White" Width="20" Height="20" Margin="5" VerticalAlignment="Center" />
-                            <TextBlock Text="Loans" Margin="10" />
-                        </StackPanel>
-                    </ListViewItem>
-                </ListView>
+                <Button x:Name="HomeBtn" 
+                    Grid.Row="4"
+                    Grid.ColumnSpan="2"
+                    Height="50"
+                    Command="{Binding switchToHomeViewCommand}" 
+                    Background="{x:Null}" 
+                    BorderBrush="{x:Null}" 
+                    Margin="0"
+                    Padding="0" HorizontalContentAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="10 0">
+                        <materialDesign:PackIcon Kind="Home" 
+                                                     Foreground="White" 
+                                                     Width="20" 
+                                                     Height="20" 
+                                                     Margin="5" 
+                                                     VerticalAlignment="Center" />
+                        <TextBlock x:Name="HomeTxt" Text="Home" Margin="10" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="IncomeBtn" 
+                    Grid.Row="5"
+                    Grid.ColumnSpan="2"
+                    Height="50"
+                    Command="{Binding switchToIncomeViewCommand}" 
+                    Background="{x:Null}" 
+                    BorderBrush="{x:Null}" 
+                    Margin="0"
+                    Padding="0" HorizontalContentAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="10 0">
+                        <materialDesign:PackIcon Kind="Dollar" 
+                                                     Foreground="White" 
+                                                     Width="20" Height="20" 
+                                                     Margin="5" 
+                                                     VerticalAlignment="Center" />
+                        <TextBlock x:Name="IncomeTxt" Text="Income" Margin="10" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="ExpnsesBtn" 
+                    Grid.Row="6"
+                    Grid.ColumnSpan="2"
+                    Height="50"
+                    Command="{Binding switchToExpensesViewCommand}" 
+                    Background="{x:Null}" 
+                    BorderBrush="{x:Null}" 
+                    Margin="0"
+                    Padding="0" HorizontalContentAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="10 0">
+                        <materialDesign:PackIcon Kind="Cash100" 
+                                                     Foreground="White"
+                                                     Width="20" 
+                                                     Height="20"
+                                                     Margin="5" 
+                                                     VerticalAlignment="Center" />
+                        <TextBlock x:Name="ExpensesTxt" Text="Expenses" Margin="10" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="SavingsBtn" 
+                    Grid.Row="7"
+                    Grid.ColumnSpan="2"
+                    Height="50"
+                    Command="{Binding switchToSavingsViewCommand}" 
+                    Background="{x:Null}" 
+                    BorderBrush="{x:Null}" 
+                    Margin="0"
+                    Padding="0" HorizontalContentAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="10 0">
+                        <materialDesign:PackIcon Kind="PiggyBank" 
+                                                     Foreground="White" 
+                                                     Width="20" 
+                                                     Height="20" 
+                                                     Margin="5" 
+                                                     VerticalAlignment="Center" />
+                        <TextBlock x:Name="SavingsTxt" Text="Savings" Margin="10" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="LoansBtn" 
+                    Grid.Row="8"
+                    Grid.ColumnSpan="2"
+                    Height="50"
+                    Command="{Binding switchToLoansViewCommand}" 
+                    Background="{x:Null}" 
+                    BorderBrush="{x:Null}" 
+                    Margin="0 0"
+                    Padding="0" HorizontalContentAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="10 0">
+                        <materialDesign:PackIcon Kind="ArchiveArrowDown" 
+                                                     Foreground="White" 
+                                                     Width="20" 
+                                                     Height="20" 
+                                                     Margin="5" 
+                                                     VerticalAlignment="Center" />
+                        <TextBlock x:Name="LoansTxt" Text="Loans" Margin="10" />
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Grid>
-        <Grid x:Name="AppBody" Grid.Row="1" Grid.Column="2" Grid.RowSpan="9" Grid.ColumnSpan="10" Background="Transparent">
-            <Frame Source="IncomeView.xaml" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <TextBlock Text="{Binding User.FirstName}" FontSize="20" Foreground="#FF28965A"/>
+        <Grid x:Name="AppBody" 
+              Grid.Row="1" 
+              Grid.Column="2" 
+              Grid.RowSpan="9" 
+              Grid.ColumnSpan="10" 
+              Background="Transparent">
+            <ContentControl x:Name="views" Content="{Binding SelectedViewModel}" />
         </Grid>
     </Grid>
 </Window>

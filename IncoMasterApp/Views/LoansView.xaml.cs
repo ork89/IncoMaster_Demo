@@ -14,11 +14,11 @@ using System.Windows.Shapes;
 namespace IncoMasterApp.Views
 {
     /// <summary>
-    /// Interaction logic for ExpensesControl.xaml
+    /// Interaction logic for LoansView.xaml
     /// </summary>
-    public partial class ExpensesControl : UserControl
+    public partial class LoansView : UserControl
     {
-        public ExpensesControl()
+        public LoansView()
         {
             InitializeComponent();
         }

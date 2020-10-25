@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="IncoMasterApp.Views.ExpensesControl"
+﻿<UserControl x:Class="IncoMasterApp.Views.SavingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,6 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TextBlock Text="Expenses" FontSize="50" Foreground="#FF2CEAA3" />
+        <TextBlock Text="Savings" FontSize="50" Foreground="#FF2CEAA3" />
     </Grid>
 </UserControl>
