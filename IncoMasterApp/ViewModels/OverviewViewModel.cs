@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IncoMasterApp.ViewModels
 {
-    public class SavingsViewModel : BaseViewModel
+    class OverviewViewModel : BaseViewModel
     {
     }
 }

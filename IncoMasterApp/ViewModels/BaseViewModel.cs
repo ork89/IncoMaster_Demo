@@ -1,19 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows.Input;
+using System.Text;
 
 namespace IncoMasterApp.ViewModels
 {
-    public class NavigationViewModel : INotifyPropertyChanged
+    public class BaseViewModel : INotifyPropertyChanged
     {
-        public NavigationViewModel()
-        {
-            
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void OnPropertyChanged(string propertyName)
+        protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

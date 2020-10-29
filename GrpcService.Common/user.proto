@@ -10,25 +10,50 @@ message User {
 	string fName = 3;
 	string lName = 4;
 	double balance = 5;
+	repeated Category income = 6;
+	repeated Category expenses = 7;
+	repeated Category savings = 8;
+	repeated Category loans = 9;
+}
+
+message Category {
+	string category = 1;
+	string title = 2;
+	double amount = 3;
 }
 
 service UserManagementService {
-	rpc AddNewUserToDB (AddNewUserRequest) returns (AddNewUserResponse){};
 
-	rpc GetUsersFromDB (GetUsersRequest) returns ( stream GetUsersResponse){};
+	rpc AddOrUpdateUser (AddOrUpdateUserRequest) returns (AddOrUpdateUserResponse);
+
+	rpc GetUser (GetUserRequest) returns (GetUserResponse);
+
+	rpc GetUsers (GetUsersRequest) returns ( stream GetUsersResponse);
 }
 
-message AddNewUserRequest {
-	User newUser = 1;
+message AddOrUpdateUserRequest {
+	User user = 1;
 }
 
-message AddNewUserResponse {
-	User newUser = 1;
+message AddOrUpdateUserResponse {
+	bool success = 1;
+	string error = 2;
 }
 
-message GetUsersRequest {
+message GetUserRequest
+{
+	string id = 1;
 }
+
+message GetUserResponse
+{
+	User user = 1;
+	string error = 2;
+}
+
+message GetUsersRequest {}
 
 message GetUsersResponse {
-	User user = 1;
+	repeated User user = 1;
+	string error = 2;
 }

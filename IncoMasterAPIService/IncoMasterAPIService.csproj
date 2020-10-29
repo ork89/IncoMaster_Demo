@@ -5,8 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.33.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GrpcService.Common\GrpcService.Common.csproj" />
+    <ProjectReference Include="..\Models\Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\GrpcService.Common\user.proto" GrpcServices="Server">
+      <Link>Proto\user.proto</Link>
+    </Protobuf>
+  </ItemGroup>
 
 </Project>

@@ -15,8 +15,8 @@
         Title="MainWindow" Height="750" Width="1000">
 
     <Window.Resources>
-        <DataTemplate DataType="{x:Type viewModels:HomeViewModel}">
-            <views:HomeView />
+        <DataTemplate DataType="{x:Type viewModels:OverviewViewModel}">
+            <views:OverviewView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:IncomeViewModel}">
             <views:IncomeView />
@@ -59,6 +59,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        
         <!-- // Top Panel // -->
         <Grid x:Name="TopMenu" Grid.Row="0" Grid.Column="10" Grid.ColumnSpan="2">
             <Button x:Name="UserBtn" 
@@ -88,6 +89,7 @@
             </Button>
         </Grid>
         <TextBlock Text="IncoMaster" Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="3" FontSize="50" Foreground="#FF2CEAA3" />
+        
         <!-- // Side Menu // -->
         <Grid x:Name="Menu" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="10" Background="#242331">
             <StackPanel VerticalAlignment="Center">
@@ -187,7 +189,9 @@
                 </Button>
             </StackPanel>
         </Grid>
-        <TextBlock Text="{Binding User.FirstName}" FontSize="20" Foreground="#FF28965A"/>
+        <TextBlock Text="{Binding LoggedUser.FirstName}" FontSize="20" Foreground="#FF28965A"/>
+        
+        <!--// App Body //-->
         <Grid x:Name="AppBody" 
               Grid.Row="1" 
               Grid.Column="2" 

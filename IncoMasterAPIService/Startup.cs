@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
+using IncoMasterAPIService.Controllers;
+using IncoMasterAPIService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace IncoMasterAPIService
 {
@@ -25,6 +22,13 @@ namespace IncoMasterAPIService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<MongoDBSettings>(Configuration.GetSection(nameof(MongoDBSettings)));
+            services.AddSingleton<IMongoDBSettings>(s => s.GetRequiredService<IOptions<MongoDBSettings>>().Value);
+
+            services.AddGrpc();
+            services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<UserService>();
+            services.AddScoped<CategoriesService>();
             services.AddControllers();
         }
 
@@ -45,6 +49,7 @@ namespace IncoMasterAPIService
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGrpcService<UsersController>();
             });
         }
     }

@@ -1,13 +1,9 @@
-﻿using GrpcService.Common;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using Models;
 using System.Windows.Input;
 
 namespace IncoMasterApp.ViewModels
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : BaseViewModel
     {
         public MainWindowViewModel()
         {
@@ -16,6 +12,8 @@ namespace IncoMasterApp.ViewModels
             switchToExpensesViewCommand = new RelayCommand(SwitchToExpensesView, param => this.CanExecute);
             switchToSavingsViewCommand = new RelayCommand(SwitchToSavingsView, param => this.CanExecute);
             switchToLoansViewCommand = new RelayCommand(SwitchToLoansView, param => this.CanExecute);
+
+            SelectedViewModel = new OverviewViewModel();
         }
 
         #region Commands
@@ -24,7 +22,6 @@ namespace IncoMasterApp.ViewModels
         public ICommand switchToExpensesViewCommand { get; set; }
         public ICommand switchToSavingsViewCommand { get; set; }
         public ICommand switchToLoansViewCommand { get; set; }
-        public ICommand itemClickedCommand { get; set; }
         #endregion Commands
 
         #region Properties
@@ -35,17 +32,28 @@ namespace IncoMasterApp.ViewModels
             get { return _selectedViewModel; }
             set
             {
-                _selectedViewModel = value;
-                OnPropertyChanged("SelectedViewModel");
+                if(value != _selectedViewModel)
+                {
+                    _selectedViewModel = value;
+                    OnPropertyChanged("SelectedViewModel");
+                }
             }
         }
 
-        private User _loggedUser;
+        private UserModel _loggedUser;
 
-        public User LoggedUser
+        public UserModel LoggedUser
         {
             get { return _loggedUser; }
-            set { _loggedUser = value; }
+            set 
+            { 
+                if(value != _loggedUser)
+                {
+                    _loggedUser = value;
+                    OnPropertyChanged("LoggedUser");
+                }
+                
+            }
         }
 
 
@@ -70,7 +78,7 @@ namespace IncoMasterApp.ViewModels
 
         private void SwitchToHomeView(object obj)
         {
-            SelectedViewModel = new HomeViewModel();
+            SelectedViewModel = new OverviewViewModel();
         }
 
         private void SwitchToIncomeView(object obj)
@@ -93,12 +101,5 @@ namespace IncoMasterApp.ViewModels
         }
 
         #endregion Methods
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }
