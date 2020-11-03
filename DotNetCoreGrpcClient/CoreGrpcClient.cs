@@ -2,27 +2,33 @@
 using GrpcService.Common;
 using Models;
 using System;
-using System.ComponentModel;
-using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace GrpcConsoleClient
+namespace DotNetCoreGrpcClient
 {
-    public class Program
+    public class CoreGrpcClient
     {
-        private static UserModel _user;        
+        private CoreGrpcClient _client;
 
-        public static async Task Main(string[] args)
+        public CoreGrpcClient Client
+        {
+            get { return _client; }
+            set { _client = value; }
+        }
+
+
+        public CoreGrpcClient()
+        {
+            using var channel = GrpcChannel.ForAddress("https://localhost:5001");
+            var userMngClient = new UserManagementService.UserManagementServiceClient(channel);
+        }
+
+        //public static async Task<UserModel> GetUsersRequest(UserManagementService.UserManagementServiceClient userMngClient)
+        public static async Task<UserModel> GetUsersRequest()
         {
             using var channel = GrpcChannel.ForAddress("https://localhost:5001");
             var userMngClient = new UserManagementService.UserManagementServiceClient(channel);
 
-            _user = await GetUsersRequest(userMngClient);
-            Console.ReadLine();
-        }
-
-        protected static async Task<UserModel> GetUsersRequest(UserManagementService.UserManagementServiceClient userMngClient)
-        {
             Console.WriteLine("gRPC client is runing");
             UserModel loggeduser = new UserModel();
             var id = "5f987797d65f2130f0c61b7e";
@@ -37,7 +43,7 @@ namespace GrpcConsoleClient
             }
 
             Console.WriteLine($"User first name: {reply.User.FName}\nUser last name: {reply.User.LName}");
-            
+
             if (reply.Error != null && !string.IsNullOrWhiteSpace(reply.Error))
                 Console.WriteLine($"Reply: {reply.Error}");
 

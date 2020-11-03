@@ -1,10 +1,18 @@
 ﻿using Models;
 using System.Windows.Input;
+using GalaSoft.MvvmLight;
+using DotNetCoreGrpcClient;
+using System;
+using System.Threading.Tasks;
 
 namespace IncoMasterApp.ViewModels
 {
     public class MainWindowViewModel : BaseViewModel
     {
+        CoreGrpcClient grpcClient;
+        private static MainWindowViewModel _instance = new MainWindowViewModel();
+        public static MainWindowViewModel Instance { get { return _instance; } }
+
         public MainWindowViewModel()
         {
             switchToHomeViewCommand = new RelayCommand(SwitchToHomeView, param => this.CanExecute);
@@ -14,6 +22,18 @@ namespace IncoMasterApp.ViewModels
             switchToLoansViewCommand = new RelayCommand(SwitchToLoansView, param => this.CanExecute);
 
             SelectedViewModel = new OverviewViewModel();
+
+            GetLoggedUser();
+        }
+
+        private async Task GetLoggedUser()
+        {
+            LoggedUser = await CoreGrpcClient.GetUsersRequest();
+            if(LoggedUser != null)
+            {
+                _userName = $"{LoggedUser.FirstName} {LoggedUser.LastName}";
+                _userBalance = LoggedUser.Balance;
+            }
         }
 
         #region Commands
@@ -26,7 +46,6 @@ namespace IncoMasterApp.ViewModels
 
         #region Properties
         private object _selectedViewModel;
-
         public object SelectedViewModel
         {
             get { return _selectedViewModel; }
@@ -41,7 +60,6 @@ namespace IncoMasterApp.ViewModels
         }
 
         private UserModel _loggedUser;
-
         public UserModel LoggedUser
         {
             get { return _loggedUser; }
@@ -55,6 +73,37 @@ namespace IncoMasterApp.ViewModels
                 
             }
         }
+
+        private string _userName;
+
+        public string UserName
+        {
+            get { return _userName; }
+            set 
+            { 
+                if(value != _userName)
+                {
+                    _userName = value;
+                    OnPropertyChanged("UserName");
+                }
+            }
+        }
+
+        private double _userBalance;
+
+        public double UserBalance
+        {
+            get { return _userBalance; }
+            set 
+            { 
+                if(value != _userBalance)
+                {
+                    _userBalance = value;
+                    OnPropertyChanged("UserBalance");
+                }
+            }
+        }
+
 
 
         private bool _canExecute = true;

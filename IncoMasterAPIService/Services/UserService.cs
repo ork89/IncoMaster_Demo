@@ -49,12 +49,14 @@ namespace IncoMasterAPIService.Services
     public class UserService
     {
         private readonly IMongoCollection<UserModel> _users;
+        private readonly IMongoCollection<CategoriesModel> _categories;
 
         public UserService(IMongoDBSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DbName);
             _users = database.GetCollection<UserModel>(settings.UsersCollectionName);
+            _categories = database.GetCollection<CategoriesModel>(settings.CategoriesCollectionName);
         }
 
         public async Task<List<UserModel>> GetAllAsync()
@@ -65,6 +67,24 @@ namespace IncoMasterAPIService.Services
         public async Task<UserModel> GetByIdAsync(string id)
         {
             return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<UserModel> GetByIdWithCategoriesAsync(string id)
+        {
+            var user = await GetByIdAsync(id);
+            if (user.Income != null && user.Income.Count > 0)
+                user.IncomeList = await _categories.Find<CategoriesModel>(c => user.Income.Contains(c.Id)).ToListAsync();
+            
+            if (user.Expenses != null && user.Expenses.Count > 0)
+                user.ExpensesList = await _categories.Find<CategoriesModel>(c => user.Expenses.Contains(c.Id)).ToListAsync();
+            
+            if (user.Savings != null && user.Savings.Count > 0)
+                user.SavingsList = await _categories.Find<CategoriesModel>(c => user.Savings.Contains(c.Id)).ToListAsync();
+            
+            if (user.Loans != null && user.Loans.Count > 0)
+                user.LoansList = await _categories.Find<CategoriesModel>(c => user.Loans.Contains(c.Id)).ToListAsync();
+
+            return user;
         }
 
         public async Task<UserModel> CreateAsync(UserModel user)

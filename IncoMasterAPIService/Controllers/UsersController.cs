@@ -61,7 +61,7 @@ namespace IncoMasterAPIService.Controllers
             return NoContent();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             var user = await _userService.GetByIdAsync(id);

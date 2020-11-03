@@ -28,7 +28,7 @@ service UserManagementService {
 
 	rpc GetUser (GetUserRequest) returns (GetUserResponse);
 
-	rpc GetUsers (GetUsersRequest) returns ( stream GetUsersResponse);
+	rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);
 }
 
 message AddOrUpdateUserRequest {

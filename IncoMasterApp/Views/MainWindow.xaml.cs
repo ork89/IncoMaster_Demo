@@ -1,18 +1,6 @@
 ﻿using IncoMasterApp.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using IncoMasterApp.Views;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace IncoMasterApp
 {
@@ -23,6 +11,12 @@ namespace IncoMasterApp
     {
         public MainWindow()
         {
+            LoginWindow win = new LoginWindow();
+            win.Owner = Owner;
+            win.Show();
+            win.Activate();
+            win.Topmost = true;
+
             InitializeComponent();
             this.DataContext = new MainWindowViewModel();
         }

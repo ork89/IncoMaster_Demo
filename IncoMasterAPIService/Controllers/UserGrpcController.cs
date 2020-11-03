@@ -24,7 +24,7 @@ namespace IncoMasterAPIService.Controllers
             {
                 if (request.Id != null)
                 {
-                    var user = await _UserService.GetByIdAsync(request.Id);
+                    var user = await _UserService.GetByIdWithCategoriesAsync(request.Id);
                     return new GetUserResponse
                     {
                         User = _mapper.Map<User>(user)

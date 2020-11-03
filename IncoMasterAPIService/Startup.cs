@@ -49,7 +49,7 @@ namespace IncoMasterAPIService
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapGrpcService<UsersController>();
+                endpoints.MapGrpcService<UserGrpcController>();
             });
         }
     }

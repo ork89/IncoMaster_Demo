@@ -13,6 +13,6 @@ namespace Models
         public string Id { get; set; }
         public string Category { get; set; }
         public string Title { get; set; }
-        public int Amount { get; set; }
+        public double Amount { get; set; }
     }
 }

@@ -13,6 +13,7 @@ namespace Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string AccountType { get; set; }
+
         [Required(ErrorMessage = "First name is required")]
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -29,6 +30,7 @@ namespace Models
 
         [BsonRepresentation(BsonType.ObjectId)]
         public List<string> Loans { get; set; }
+
 
         [BsonIgnore]
         public List<CategoriesModel> IncomeList { get; set; }
