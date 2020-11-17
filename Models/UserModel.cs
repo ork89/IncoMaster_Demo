@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Security;
 using System.Text;
 
 namespace Models
@@ -13,6 +14,8 @@ namespace Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string AccountType { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
 
         [Required(ErrorMessage = "First name is required")]
         public string FirstName { get; set; }

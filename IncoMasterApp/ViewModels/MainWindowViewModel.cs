@@ -4,6 +4,9 @@ using GalaSoft.MvvmLight;
 using DotNetCoreGrpcClient;
 using System;
 using System.Threading.Tasks;
+using System.Windows.Documents;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace IncoMasterApp.ViewModels
 {
@@ -15,36 +18,43 @@ namespace IncoMasterApp.ViewModels
 
         public MainWindowViewModel()
         {
-            switchToHomeViewCommand = new RelayCommand(SwitchToHomeView, param => this.CanExecute);
-            switchToIncomeViewCommand = new RelayCommand(SwitchToIncomeView, param => this.CanExecute);
-            switchToExpensesViewCommand = new RelayCommand(SwitchToExpensesView, param => this.CanExecute);
-            switchToSavingsViewCommand = new RelayCommand(SwitchToSavingsView, param => this.CanExecute);
-            switchToLoansViewCommand = new RelayCommand(SwitchToLoansView, param => this.CanExecute);
+            SwitchToHomeViewCommand = new RelayCommand(SwitchToHomeView, param => this.CanExecute);
+            SwitchToIncomeViewCommand = new RelayCommand(SwitchToIncomeView, param => this.CanExecute);
+            SwitchToExpensesViewCommand = new RelayCommand(SwitchToExpensesView, param => this.CanExecute);
+            SwitchToSavingsViewCommand = new RelayCommand(SwitchToSavingsView, param => this.CanExecute);
+            SwitchToLoansViewCommand = new RelayCommand(SwitchToLoansView, param => this.CanExecute);
 
-            SelectedViewModel = new OverviewViewModel();
-
-            GetLoggedUser();
+            //GetLoggedUser();
         }
 
         private async Task GetLoggedUser()
         {
             LoggedUser = await CoreGrpcClient.GetUsersRequest();
-            if(LoggedUser != null)
+            RaisePropertyChange("LoggedUser");
+            if (_loggedUser != null)
             {
-                _userName = $"{LoggedUser.FirstName} {LoggedUser.LastName}";
-                _userBalance = LoggedUser.Balance;
+                UserName = $"{_loggedUser.FirstName} {_loggedUser.LastName}";
+                UserBalance = _loggedUser.Balance;
+                IncomeList = _loggedUser.IncomeList;
+                ExpensesList = _loggedUser.ExpensesList;
+                SavingsList = _loggedUser.SavingsList;
+                LoansList = _loggedUser.LoansList;
+
+                SelectedViewModel = new OverviewViewModel();
+                RaisePropertyChange("SelectedViewModel");
             }
         }
 
         #region Commands
-        public ICommand switchToHomeViewCommand { get; set; }
-        public ICommand switchToIncomeViewCommand { get; set; }
-        public ICommand switchToExpensesViewCommand { get; set; }
-        public ICommand switchToSavingsViewCommand { get; set; }
-        public ICommand switchToLoansViewCommand { get; set; }
+        public ICommand SwitchToHomeViewCommand { get; set; }
+        public ICommand SwitchToIncomeViewCommand { get; set; }
+        public ICommand SwitchToExpensesViewCommand { get; set; }
+        public ICommand SwitchToSavingsViewCommand { get; set; }
+        public ICommand SwitchToLoansViewCommand { get; set; }
         #endregion Commands
 
         #region Properties
+
         private object _selectedViewModel;
         public object SelectedViewModel
         {
@@ -54,7 +64,7 @@ namespace IncoMasterApp.ViewModels
                 if(value != _selectedViewModel)
                 {
                     _selectedViewModel = value;
-                    OnPropertyChanged("SelectedViewModel");
+                    RaisePropertyChange();
                 }
             }
         }
@@ -63,14 +73,13 @@ namespace IncoMasterApp.ViewModels
         public UserModel LoggedUser
         {
             get { return _loggedUser; }
-            set 
-            { 
-                if(value != _loggedUser)
+            set
+            {
+                if (value != _loggedUser)
                 {
                     _loggedUser = value;
-                    OnPropertyChanged("LoggedUser");
+                    RaisePropertyChange();
                 }
-                
             }
         }
 
@@ -84,7 +93,7 @@ namespace IncoMasterApp.ViewModels
                 if(value != _userName)
                 {
                     _userName = value;
-                    OnPropertyChanged("UserName");
+                    RaisePropertyChange();
                 }
             }
         }
@@ -99,12 +108,70 @@ namespace IncoMasterApp.ViewModels
                 if(value != _userBalance)
                 {
                     _userBalance = value;
-                    OnPropertyChanged("UserBalance");
+                    RaisePropertyChange();
                 }
             }
         }
 
+        private IList<CategoriesModel> _incomeList;
 
+        public IList<CategoriesModel> IncomeList
+        {
+            get { return _incomeList; }
+            set
+            {
+                if (value != _incomeList)
+                {
+                    _incomeList = value;
+                    RaisePropertyChange();
+                }
+            }
+        }
+
+        private IList<CategoriesModel> _expensesList;
+
+        public IList<CategoriesModel> ExpensesList
+        {
+            get { return _expensesList; }
+            set 
+            { 
+                if(value != _expensesList)
+                {
+                    _expensesList = value;
+                    RaisePropertyChange();
+                }
+            }
+        }
+
+        private IList<CategoriesModel> _savingsList;
+
+        public IList<CategoriesModel> SavingsList
+        {
+            get { return _savingsList; }
+            set 
+            { 
+                if(value != _savingsList)
+                {
+                    _savingsList = value;
+                    RaisePropertyChange();
+                }
+            }
+        }
+
+        private IList<CategoriesModel> _loansList;
+
+        public IList<CategoriesModel> LoansList
+        {
+            get { return _loansList; }
+            set
+            {
+                if (value != _loansList)
+                {
+                    _loansList = value;
+                    RaisePropertyChange();
+                }
+            }
+        }
 
         private bool _canExecute = true;
         public bool CanExecute
@@ -123,7 +190,7 @@ namespace IncoMasterApp.ViewModels
 
         #endregion Properties
 
-        #region Methods
+        #region CommandMethods
 
         private void SwitchToHomeView(object obj)
         {
@@ -134,6 +201,7 @@ namespace IncoMasterApp.ViewModels
         {
             SelectedViewModel = new IncomeViewModel();
         }
+
         private void SwitchToExpensesView(object obj)
         {
             SelectedViewModel = new ExpensesViewModel();
@@ -149,6 +217,6 @@ namespace IncoMasterApp.ViewModels
             SelectedViewModel = new LoansViewModel();
         }
 
-        #endregion Methods
+        #endregion CommandMethods
     }
 }

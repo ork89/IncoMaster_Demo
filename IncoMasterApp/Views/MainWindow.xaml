@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"        
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:views="clr-namespace:IncoMasterApp.Views"
         xmlns:viewModels="clr-namespace:IncoMasterApp.ViewModels"
         mc:Ignorable="d"
@@ -69,7 +70,7 @@
             <Button x:Name="UserBtn" 
                     VerticalAlignment="Top" 
                     HorizontalAlignment="Right"
-                    Command="{Binding switchToIncomeViewCommand}" 
+                    Command="{Binding SwitchToIncomeViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
                     Margin="0"
@@ -81,7 +82,7 @@
             <Button x:Name="SettingsBtn"
                     VerticalAlignment="Top" 
                     HorizontalAlignment="Right"
-                    Command="{Binding switchToExpensesViewCommand}" 
+                    Command="{Binding SwitchToExpensesViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
                     Width="30"
@@ -90,7 +91,7 @@
                     Padding="0">
                 <materialDesign:PackIcon Kind="Settings" Foreground="#FF28965A" Width="20" Height="20" />
             </Button>
-            <TextBlock Text="{Binding Path=UserName}" 
+            <TextBlock Text="{Binding Path=UserName, NotifyOnSourceUpdated=True, Mode=TwoWay}" 
                        FontSize="20"
                        Foreground="#FFF"
                        Margin="0 0 65 0"
@@ -99,7 +100,6 @@
                        Height="30"
                        Width="100"/>
         </Grid>
-        <TextBlock Text="IncoMaster" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="3" FontSize="50" Foreground="#FF28965A" />
 
         <!-- // Side Menu // -->
         <Grid x:Name="Menu" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="10" Background="#242331">
@@ -109,11 +109,11 @@
                     Grid.Row="4"
                     Grid.ColumnSpan="2"
                     Height="50"
-                    Command="{Binding switchToHomeViewCommand}" 
+                    Command="{Binding SwitchToHomeViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
                     Margin="0"
-                    Padding="0" HorizontalContentAlignment="Left">
+                    Padding="0">
                     <StackPanel Orientation="Horizontal" Margin="10 0">
                         <materialDesign:PackIcon Kind="Home" 
                                                      Foreground="White" 
@@ -122,17 +122,23 @@
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="HomeTxt" Text="Home" Margin="10" />
+                        <materialDesign:PackIcon Kind="ChevronRight"
+                                                 Foreground="White" 
+                                                     Width="20" 
+                                                     Height="20" 
+                                                     Margin="15 0" 
+                                                     VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button x:Name="IncomeBtn" 
                     Grid.Row="5"
                     Grid.ColumnSpan="2"
                     Height="50"
-                    Command="{Binding switchToIncomeViewCommand}" 
+                    Command="{Binding SwitchToIncomeViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
                     Margin="0"
-                    Padding="0" HorizontalContentAlignment="Left">
+                    Padding="0">
                     <StackPanel Orientation="Horizontal" Margin="10 0">
                         <materialDesign:PackIcon Kind="Dollar" 
                                                      Foreground="White" 
@@ -140,17 +146,23 @@
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="IncomeTxt" Text="Income" Margin="10" />
+                        <materialDesign:PackIcon Kind="ChevronRight"
+                                                 Foreground="White" 
+                                                     Width="20" 
+                                                     Height="20" 
+                                                     Margin="15 0" 
+                                                     VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button x:Name="ExpnsesBtn" 
                     Grid.Row="6"
                     Grid.ColumnSpan="2"
                     Height="50"
-                    Command="{Binding switchToExpensesViewCommand}" 
+                    Command="{Binding SwitchToExpensesViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
                     Margin="0"
-                    Padding="0" HorizontalContentAlignment="Left">
+                    Padding="0">
                     <StackPanel Orientation="Horizontal" Margin="10 0">
                         <materialDesign:PackIcon Kind="Cash100" 
                                                      Foreground="White"
@@ -159,17 +171,23 @@
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="ExpensesTxt" Text="Expenses" Margin="10" />
+                        <materialDesign:PackIcon Kind="ChevronRight"
+                                                 Foreground="White" 
+                                                     Width="20" 
+                                                     Height="20" 
+                                                     Margin="15 0" 
+                                                     VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button x:Name="SavingsBtn" 
                     Grid.Row="7"
                     Grid.ColumnSpan="2"
                     Height="50"
-                    Command="{Binding switchToSavingsViewCommand}" 
+                    Command="{Binding SwitchToSavingsViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
                     Margin="0"
-                    Padding="0" HorizontalContentAlignment="Left">
+                    Padding="0">
                     <StackPanel Orientation="Horizontal" Margin="10 0">
                         <materialDesign:PackIcon Kind="PiggyBank" 
                                                      Foreground="White" 
@@ -178,17 +196,26 @@
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="SavingsTxt" Text="Savings" Margin="10" />
+                        <materialDesign:PackIcon Kind="ChevronRight"
+                                                 Foreground="White" 
+                                                     Width="20" 
+                                                     Height="20" 
+                                                     Margin="15 0" 
+                                                     VerticalAlignment="Center"
+                                                     HorizontalContentAlignment="Right"
+                                                     HorizontalAlignment="Right" />
                     </StackPanel>
                 </Button>
                 <Button x:Name="LoansBtn" 
                     Grid.Row="8"
                     Grid.ColumnSpan="2"
                     Height="50"
-                    Command="{Binding switchToLoansViewCommand}" 
+                    Command="{Binding SwitchToLoansViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
-                    Margin="0 0"
-                    Padding="0" HorizontalContentAlignment="Left">
+                    Margin="0"
+                    Padding="0" 
+                    HorizontalContentAlignment="Left">
                     <StackPanel Orientation="Horizontal" Margin="10 0">
                         <materialDesign:PackIcon Kind="ArchiveArrowDown" 
                                                      Foreground="White" 
@@ -197,11 +224,25 @@
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="LoansTxt" Text="Loans" Margin="10" />
+                        <materialDesign:PackIcon Kind="ChevronRight"
+                                                 Foreground="White" 
+                                                     Width="20" 
+                                                     Height="20" 
+                                                     Margin="15 0"
+                                                     VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </StackPanel>
         </Grid>
 
+        <TextBlock Text="IncoMaster" 
+                   Grid.Row="0" 
+                   Grid.Column="0" 
+                   Grid.ColumnSpan="2" 
+                   Margin="20 0 0 4"
+                   FontSize="20" 
+                   Foreground="#FF28965A" />
+        
         <!--// App Body //-->
         <Grid x:Name="AppBody" 
               Grid.Row="1" 
@@ -210,6 +251,7 @@
               Grid.ColumnSpan="10" 
               Background="Transparent">
             <ContentControl x:Name="views" Content="{Binding SelectedViewModel}" />
+
         </Grid>
     </Grid>
 </Window>

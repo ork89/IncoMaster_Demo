@@ -1,5 +1,7 @@
-﻿using IncoMasterApp.ViewModels;
+﻿using IncoMasterApp.Interfaces;
+using IncoMasterApp.ViewModels;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace IncoMasterApp.Views
@@ -12,21 +14,24 @@ namespace IncoMasterApp.Views
         public LoginWindow()
         {
             InitializeComponent();
-
-            LoginViewModel vm = new LoginViewModel();
-            this.DataContext = vm;
+            this.DataContext = new LoginViewModel(new WindowService());
         }
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs args)
         {
-            DragMove();
+            //DragMove();
         }
 
         private void exitBtn_Click(object sender, RoutedEventArgs e)
         {
-            //Application.Current.Shutdown();
             this.Close();
-            this.DataContext = MainWindowViewModel.Instance;
+            this.DataContext = new MainWindowViewModel();
+        }
+
+        private void passwordPb_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext != null)
+                (DataContext as LoginViewModel).SetPassword((sender as PasswordBox).SecurePassword);
         }
     }
 }

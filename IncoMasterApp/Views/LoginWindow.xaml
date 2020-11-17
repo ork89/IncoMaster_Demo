@@ -1,94 +1,102 @@
-﻿<Window x:Class="IncoMasterApp.Views.LoginWindow"
+﻿<Window x:Class="IncoMasterApp.Views.LoginWindow" x:Name="UserLoginWin"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewModels="clr-namespace:IncoMasterApp.ViewModels"
+             xmlns:views="clr-namespace:IncoMasterApp.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" 
+             d:DesignHeight="500" 
              d:DesignWidth="400"
              MaxWidth="400"
-             MaxHeight="450"
+             MaxHeight="500"
              WindowStartupLocation="CenterScreen"
-             ResizeMode="NoResize"
-             WindowStyle="None">
-    
-    <Grid MouseDown="Border_MouseDown">
+             ResizeMode="NoResize" >
+    <!--
+             WindowStyle="None"-->
+
+    <Grid MouseDown="Border_MouseDown" Height="500">
         <Grid.Background>
             <LinearGradientBrush StartPoint="0.1,0" EndPoint="0.9,1">
-                <GradientStop Color="#EFE63070" Offset="1" />
-                <GradientStop Color="#FFFE8704" Offset="0" />
+                <GradientStop Color="#009688" Offset="1" />
+                <GradientStop Color="#1DE9B6" Offset="0" />
             </LinearGradientBrush>
         </Grid.Background>
         <Border Height="390" VerticalAlignment="Top" CornerRadius="0 0 180 0" Background="#100E17" MouseDown="Border_MouseDown"/>
-        <StackPanel Margin="10" Width="60" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
+        <StackPanel Margin="0" Width="400" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+            <TextBlock Text="IncoMaster" 
+                       Margin="30 10 0 0" 
+                       Foreground="#FFF"
+                       FontSize="38" 
+                       FontFamily="Helvetica" />
             <Button x:Name="exitBtn"
                     Background="{x:Null}"
                     ToolTip="Close"
                     Click="exitBtn_Click"
+                    Height="30"
+                    Width="30"
+                    Margin="130 -10 0 0"
                     Style="{StaticResource MaterialDesignFloatingActionButton}">
                 <materialDesign:PackIcon Kind="Close" Foreground="#FFF" Width="25" Height="25" />
             </Button>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal">
-            <!--<StackPanel Width="350">
-                <Image Source="images/..." Width="300" Height="300" VerticalAlignment="Top" Margin="30" Stretch="Fill" />
-            </StackPanel>-->
-            <StackPanel Width="330" VerticalAlignment="Center" Margin="35">
-                <StackPanel Margin="40 0">
-                    <TextBlock Text="User Login" Margin="20" Foreground="#FFF" TextAlignment="Center" FontSize="38" FontFamily="Helvetica" />
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <materialDesign:PackIcon Kind="User" Width="25" Height="25" Foreground="#FFF" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Width="330" VerticalAlignment="Center" >
+                <StackPanel Margin="30 0 0 30">
+                    <!--<TextBlock Text="IncoMaster" Margin="10 0 0 20" Foreground="#FFF" TextAlignment="Center" FontSize="38" FontFamily="Helvetica" />-->
+                    <StackPanel Orientation="Horizontal" Margin="10 0 16 10">
+                        <materialDesign:PackIcon Kind="User" Width="25" Height="25" Foreground="#FFF" Margin="0 30 0 0" />
                         <TextBox x:Name="userNameTb"
                                  Margin="10 0" 
-                                 materialDesign:HintAssist.Hint="User Name / Email" 
-                                 Foreground="#FFF" 
+                                 Text="{Binding Email, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+                                 materialDesign:HintAssist.Hint="Email" 
+                                 materialDesign:HintAssist.Foreground="#009688"
+                                 materialDesign:TextFieldAssist.UnderlineBrush="#1DE9B6"
+                                 Foreground="#FFF"
+                                 BorderBrush="#1DE9B6"
                                  Width="250" 
-                                 BorderBrush="#FFF"
-                                 CaretBrush="#FFD94448"
-                                 SelectionBrush="#FFD94448" />
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 FocusManager.FocusedElement="{Binding ElementName=userNameTb}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <materialDesign:PackIcon Kind="Lock" Width="25" Height="25" Foreground="#FFF" />
+                    <StackPanel Orientation="Horizontal" Margin="10 10 16 0">
+                        <materialDesign:PackIcon Kind="Lock" Width="25" Height="25" Foreground="#FFF" Margin="0 30 0 0" />
                         <PasswordBox x:Name="passwordPb"
                                  Margin="10 0" 
-                                 materialDesign:HintAssist.Hint="********" 
-                                 Foreground="#FFF" 
-                                 Width="250" 
-                                 BorderBrush="#FFF"
-                                 CaretBrush="#FFD94448"
-                                 SelectionBrush="#FFD94448" />
+                                 materialDesign:HintAssist.Hint="Password"
+                                 materialDesign:HintAssist.Foreground="#009688"
+                                 materialDesign:TextFieldAssist.UnderlineBrush="#1DE9B6"
+                                 Foreground="#FFF"
+                                 BorderBrush="#1DE9B6"
+                                 Width="250"
+                                 Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+                                 Tag="{Binding ExtraLoginPass,UpdateSourceTrigger=PropertyChanged, Mode=OneWay, ValidatesOnDataErrors=True}"
+                                 PasswordChanged="passwordPb_PasswordChanged" />
                     </StackPanel>
-                    <StackPanel Margin="20" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Margin="50 40 0 0"
+                               FontSize="14"
+                               Foreground="#ff5959"
+                               Text="{Binding ErrorMessage, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                    <StackPanel Margin="20 40 20 0" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button x:Name="loginBtn"
                                 Width="80" 
                                 Height="30" 
-                                Style="{StaticResource MaterialDesignFlatButton}"
+                                Style="{StaticResource MaterialDesignRaisedDarkButton}"
                                 materialDesign:ButtonAssist.CornerRadius="10" 
-                                BorderThickness="1"
-                                BorderBrush="#FFD94448"
-                                Background="#D94448"
-                                Foreground="#FFF"
                                 Content="Login"
-                                ToolTip="Login"
-                                Command="{Binding LoginUserCommand}"
-                                Margin="10">
-                        </Button>
+                                Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=UserLoginWin}"
+                                Margin="10" />
+                                <!--Command="{Binding LoginUserCommand}"-->
+                        
                         <Button x:Name="registerBtn"
                                 Width="85" 
                                 Height="30" 
-                                Style="{StaticResource MaterialDesignFlatButton}"
-                                materialDesign:ButtonAssist.CornerRadius="10" 
-                                BorderThickness="1"
-                                BorderBrush="#FFD94448"
-                                Background="#D94448"
-                                Foreground="#FFF"
+                                Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                                materialDesign:ButtonAssist.CornerRadius="10"                                 
                                 Content="Register"
-                                ToolTip="Login"
-                                Command="{Binding RegisterNewUserCommand}"
-                                Margin="10">
-                        </Button>
+                                Command="{Binding Path=RegisterNewUserCommand}"
+                                Margin="10" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

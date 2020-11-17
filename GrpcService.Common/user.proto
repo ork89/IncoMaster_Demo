@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
 option csharp_namespace = "GrpcService.Common";
 
 package user;
@@ -7,28 +8,56 @@ package user;
 message User {
 	string id = 1;
 	string accountType = 2;
-	string fName = 3;
-	string lName = 4;
-	double balance = 5;
-	repeated Category income = 6;
-	repeated Category expenses = 7;
-	repeated Category savings = 8;
-	repeated Category loans = 9;
+	string email = 3;
+	string password = 4;
+	string fName = 5;
+	string lName = 6;
+	double balance = 7;
+	repeated Category income = 8;
+	repeated Category expenses = 9;
+	repeated Category savings = 10;
+	repeated Category loans = 11;
 }
 
 message Category {
-	string category = 1;
-	string title = 2;
-	double amount = 3;
+	string id = 1;
+	string category = 2;
+	string title = 3;
+	double amount = 4;
+	google.protobuf.Timestamp SubmitDate = 5;
 }
 
 service UserManagementService {
+
+	rpc LoginUser (LoginUserRequest) returns (LoginUserResponse);
+
+	rpc AuthenticateUser (AuthenticateUserRequest) returns (AuthenticateUserResponse);
 
 	rpc AddOrUpdateUser (AddOrUpdateUserRequest) returns (AddOrUpdateUserResponse);
 
 	rpc GetUser (GetUserRequest) returns (GetUserResponse);
 
 	rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);
+}
+
+message LoginUserRequest {
+	string email = 1;
+	string password = 2;
+}
+
+message LoginUserResponse {
+	User user = 1;
+	string error = 2;
+}
+
+message AuthenticateUserRequest {
+	string email = 1;
+	string password = 2;
+}
+
+message AuthenticateUserResponse {
+	bool success = 1;
+	string error = 2;
 }
 
 message AddOrUpdateUserRequest {

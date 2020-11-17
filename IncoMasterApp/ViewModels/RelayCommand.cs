@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LiveCharts;
+using System;
 using System.Windows.Input;
 
 namespace IncoMasterApp.ViewModels
@@ -10,6 +11,8 @@ namespace IncoMasterApp.ViewModels
         private Action<object> execute;
 
         private Predicate<object> canExecute;
+
+        //public Action<object, object> PassedParameter { get; }
 
         #endregion // Fields
 
@@ -25,6 +28,14 @@ namespace IncoMasterApp.ViewModels
             this.execute = execute ?? throw new ArgumentNullException("execute");
             this.canExecute = canExecute ?? throw new ArgumentNullException("canExecute");
         }
+
+        //public RelayCommand(Action<object, object> paramter, Predicate<object> canExecute)
+        //{
+        //    PassedParameter = paramter;
+        //    this.canExecute = canExecute ?? throw new ArgumentNullException("canExecute");
+        //}
+
+        //public RelayCommand(Action<object> execute, Func<bool> canExecute, bool keepTargetAlive = false) { }
 
         #endregion // Constructors
 

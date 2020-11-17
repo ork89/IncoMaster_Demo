@@ -13,7 +13,7 @@ namespace IncoMasterApp
         {
             LoginWindow win = new LoginWindow();
             win.Owner = Owner;
-            win.Show();
+            win.ShowDialog();
             win.Activate();
             win.Topmost = true;
 

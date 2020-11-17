@@ -20,28 +20,28 @@ namespace IncoMasterAPIService.Services
 
         public async Task<List<CategoriesModel>> GetAllAsync()
         {
-            return await _categories.Find(s => true).ToListAsync();
+            return await _categories.Find(s => true).ToListAsync().ConfigureAwait(false);
         }
 
         public async Task<CategoriesModel> GetByIdAsync(string id)
         {
-            return await _categories.Find<CategoriesModel>(c => c.Id == id).FirstOrDefaultAsync();
+            return await _categories.Find<CategoriesModel>(c => c.Id == id).FirstOrDefaultAsync().ConfigureAwait(false);
         }
 
         public async Task<CategoriesModel> CreateAsync(CategoriesModel course)
         {
-            await _categories.InsertOneAsync(course);
+            await _categories.InsertOneAsync(course).ConfigureAwait(false);
             return course;
         }
 
         public async Task UpdateAsync(string id, CategoriesModel course)
         {
-            await _categories.ReplaceOneAsync(c => c.Id == id, course);
+            await _categories.ReplaceOneAsync(c => c.Id == id, course).ConfigureAwait(false);
         }
 
         public async Task DeleteAsync(string id)
         {
-            await _categories.DeleteOneAsync(c => c.Id == id);
+            await _categories.DeleteOneAsync(c => c.Id == id).ConfigureAwait(false);
         }
     }
 }

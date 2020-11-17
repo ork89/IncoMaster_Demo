@@ -6,7 +6,40 @@
              xmlns:local="clr-namespace:IncoMasterApp.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <Grid>
-        <TextBlock Text="Savings" FontSize="35" FontFamily="Helvetica" Foreground="#FF2CEAA3" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="4*" />
+        </Grid.RowDefinitions>
+        <TextBlock Text="Savings"
+                   FontSize="35" 
+                   FontFamily="Helvetica"
+                   Grid.ColumnSpan="2"
+                   Foreground="#FF2CEAA3" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Top"/>
+        
+        <ListView ItemsSource="{Binding SavingsList}" 
+                  Grid.Row="1"
+                  Grid.ColumnSpan="2"
+                  Width="400"
+                  Margin="30 0 0 0"
+                  HorizontalAlignment="Left">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Title}"
+                                    Header="Type" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Amount}"
+                                    Header="Name" />
+                    <GridViewColumn DisplayMemberBinding="{Binding SubmitDate}"
+                                    Header="Date" />
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </UserControl>
