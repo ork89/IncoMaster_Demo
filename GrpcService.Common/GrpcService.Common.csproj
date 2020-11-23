@@ -5,7 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="categories.proto" />
     <None Remove="user.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="categories.proto" />
   </ItemGroup>
 
   <ItemGroup>

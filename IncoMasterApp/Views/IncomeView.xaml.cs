@@ -22,5 +22,11 @@ namespace IncoMasterApp.Views
         {
             InitializeComponent();
         }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if ((sender as TextBox).Text == "0")
+                (sender as TextBox).Text = "";
+        }
     }
 }

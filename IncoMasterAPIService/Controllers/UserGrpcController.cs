@@ -28,11 +28,16 @@ namespace IncoMasterAPIService.Controllers
                 LoginUserResponse response = new LoginUserResponse();
                 var user = await _UserService.LoginUserAsync(request.Email, request.Password);
 
-                if (user != null)
+                if (user == null)
                 {
-                    var userToLogin = await _UserService.GetByIdWithCategoriesAsync(user.Id);                    
-                    response.User = _mapper.Map<User>(userToLogin);
+                    return new LoginUserResponse
+                    {
+                        Error = "Login Faild. User not found"
+                    };
                 }
+                    
+                var userToLogin = await _UserService.GetByIdWithCategoriesAsync(user.Id);                    
+                response.User = _mapper.Map<User>(userToLogin);
 
                 return response;
             }
@@ -111,6 +116,40 @@ namespace IncoMasterAPIService.Controllers
             catch (Exception ex)
             {
                 return new AddOrUpdateUserResponse { Error = $"{ex.Message}" };
+            }
+        }
+
+        public override async Task<InsertCategoryResponse> InsertCategory(InsertCategoryRequest request, ServerCallContext context)
+        {
+            try
+            {
+                if (request == null || string.IsNullOrEmpty(request.CategoryId) || string.IsNullOrEmpty(request.CategoryType))
+                    return new InsertCategoryResponse { Error = "Category id or type are missing" };
+
+                await _UserService.InsertCategoryAsync(request.CategoryId, request.CategoryType, request.UserId);
+
+                return new InsertCategoryResponse { Success = true };
+            }
+            catch (Exception ex)
+            {
+                return new InsertCategoryResponse { Error = $"{ex.Message}" };
+            }
+        }
+
+        public override async Task<DeleteCategoryFromUserResponse> DeleteCategoryFromUser(DeleteCategoryFromUserRequest request, ServerCallContext context)
+        {
+            try
+            {
+                if (request == null || string.IsNullOrEmpty(request.CategoryId) || string.IsNullOrEmpty(request.CategoryType))
+                    return new DeleteCategoryFromUserResponse { Error = "Category id or type are missing" };
+
+                var result = await _UserService.DeleteCategoryAsync(request.CategoryId, request.CategoryType, request.UserId);
+
+                return new DeleteCategoryFromUserResponse { Success = result };
+            }
+            catch (Exception ex)
+            {
+                return new DeleteCategoryFromUserResponse { Error = $"{ex.Message}" };
             }
         }
     }

@@ -21,6 +21,7 @@ namespace IncoMasterApp.Views
         {
             InitializeComponent();
             this.DataContext = new OverviewViewModel(this);
+            //this.DataContext = new MainWindowViewModel();
         }
 
         private void Chart_OnDataClick(object sender, ChartPoint chartpoint)

@@ -92,6 +92,23 @@ namespace IncoMasterAPIService.Services
             await _users.ReplaceOneAsync(u => u.Id == id, user).ConfigureAwait(false);
         }
 
+        public async Task InsertCategoryAsync(string categoryId, string categoryType, string userId)
+        {
+            var filter = Builders<UserModel>.Filter.Eq(x => x.Id, userId);
+            var update = Builders<UserModel>.Update.Push(categoryType, categoryId);
+
+            await _users.UpdateOneAsync(filter, update);
+        }
+
+        public async Task<bool> DeleteCategoryAsync(string categoryId, string categoryType, string userId)
+        {
+            var filter = Builders<UserModel>.Filter.Eq(x => x.Id, userId);
+            var update = Builders<UserModel>.Update.Pull(categoryType, categoryId);
+
+            var result = await _users.UpdateOneAsync(filter, update);
+            return result.IsAcknowledged && result.ModifiedCount > 0;
+        }
+
         public async Task DeleteAsync(string id)
         {
             await _users.DeleteOneAsync(u => u.Id == id).ConfigureAwait(false);

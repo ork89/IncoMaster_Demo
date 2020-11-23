@@ -15,5 +15,7 @@ namespace IncoMasterAPIService.Interfaces
         Task<UserModel> CreateAsync(UserModel user);
         Task UpdateAsync(string id, UserModel student);
         Task DeleteAsync(string id);
+        Task InsertCategoryAsync(string categoryId, string categoryType, string userId);
+        Task<bool> DeleteCategoryAsync(string categoryId, string categoryType, string userId);
     }
 }

@@ -70,6 +70,7 @@ namespace IncoMasterAPIService
             {
                 endpoints.MapControllers();
                 endpoints.MapGrpcService<UserGrpcController>();
+                endpoints.MapGrpcService<CategoriesGrpcController>();
             });
         }
     }

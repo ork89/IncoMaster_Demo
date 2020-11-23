@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:IncoMasterApp.Views"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -23,23 +25,98 @@
                    HorizontalAlignment="Center" 
                    VerticalAlignment="Top"/>
 
-        <ListView ItemsSource="{Binding IncomeList}" 
+        <ListView ItemsSource="{Binding IncomeList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                  SelectedItem="{Binding SelectedRow, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
                   Grid.Row="1"
                   Grid.ColumnSpan="2"
                   Width="400"
                   Margin="30 0 0 0"
+                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                   HorizontalAlignment="Left">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Title}"
                                     Header="Type" />
                     <GridViewColumn DisplayMemberBinding="{Binding Amount}"
-                                    Header="Name" />
+                                    Header="Amount" />
                     <GridViewColumn DisplayMemberBinding="{Binding SubmitDate}"
                                     Header="Date" />
                 </GridView>
             </ListView.View>
         </ListView>
+
+        <materialDesign:DialogHost Identifier="RootDialogHost" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+            <materialDesign:DialogHost.DialogContentTemplate>
+                <DataTemplate DataType="local:IncomeViewModel">
+                    <StackPanel Margin="20" MinWidth="300">
+                        <StackPanel>
+                            <TextBlock Text="Type:" Margin="0 0 0 -30" />
+                            <ComboBox ItemsSource="{Binding IncomeTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                      SelectedItem="{Binding SelectedIncomeType}" Width="150" />
+                        </StackPanel>
+                        <TextBlock Text="Amount" Margin="0,30,0,-20"/>
+                        <TextBox x:Name="IncomeAmountTb" Text="{Binding IncomeAmount}" Width="150" GotFocus="TextBox_GotFocus"/>
+                        <UniformGrid >
+                            <TextBlock Text="Date:" Margin="0 30 0 0" />
+                            <DatePicker x:Name="IncomeDatePicker"
+                                        Width="100"
+                                        Margin="0 10 50 10"
+                                        SelectedDate="{Binding IncomeSubmitDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        materialDesign:HintAssist.Hint="Pick Date"
+                                        Style="{StaticResource MaterialDesignFloatingHintDatePicker}" />
+                        </UniformGrid>
+                        <Grid Margin="0,10,0,-10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatAccentButton}" IsCancel="True" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
+                            <Button Content="Add" Grid.Column="1" IsDefault="True" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" >
+                                <Button.CommandParameter>
+                                    <system:Boolean>True</system:Boolean>
+                                </Button.CommandParameter>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </DataTemplate>
+            </materialDesign:DialogHost.DialogContentTemplate>
+        </materialDesign:DialogHost>
+
+        <materialDesign:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom">
+            <materialDesign:DialogHost.DialogContentTemplate>
+                <DataTemplate DataType="local:IncomeViewModel">
+                    <StackPanel Margin="20" MinWidth="300">
+                        <StackPanel>
+                            <TextBlock Text="Type:" Margin="0 0 0 -30" />
+                            <ComboBox ItemsSource="{Binding IncomeTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                      SelectedItem="{Binding SelectedIncomeType}" Width="150" />
+                        </StackPanel>
+                        <TextBlock Text="Amount" Margin="0,30,0,-20"/>
+                        <TextBox x:Name="IncomeAmountTb" Text="{Binding IncomeAmount}" Width="150" GotFocus="TextBox_GotFocus"/>
+                        <UniformGrid >
+                            <TextBlock Text="Date:" Margin="0 30 0 0" />
+                            <DatePicker x:Name="IncomeDatePicker"
+                                        Width="100"
+                                        Margin="0 10 50 10"
+                                        SelectedDate="{Binding IncomeSubmitDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        materialDesign:HintAssist.Hint="Pick Date"
+                                        Style="{StaticResource MaterialDesignFloatingHintDatePicker}" />
+                        </UniformGrid>
+                        <Grid Margin="0,10,0,-10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatAccentButton}" IsCancel="True" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
+                            <Button Content="Edit" Grid.Column="1" IsDefault="True" Command="{Binding EditIncomeCommand}" />
+
+                        </Grid>
+                    </StackPanel>
+                </DataTemplate>
+            </materialDesign:DialogHost.DialogContentTemplate>
+        </materialDesign:DialogHost>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0 30" Grid.Row="1">
             <Button x:Name="IncomeAddBtn"
@@ -70,5 +147,12 @@
                 <TextBlock Text="Delete" />
             </Button>
         </StackPanel>
+        <materialDesign:Snackbar Grid.Row="1"
+                                 Grid.Column="0"
+                                 Grid.ColumnSpan="2"
+                                 VerticalAlignment="Bottom"
+                                 HorizontalAlignment="Center"
+                                 Message="{Binding IncomeSnackbarMessage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                 IsActive="{Binding IsSnackbarActive, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
     </Grid>
 </UserControl>

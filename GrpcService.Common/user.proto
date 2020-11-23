@@ -24,7 +24,7 @@ message Category {
 	string category = 2;
 	string title = 3;
 	double amount = 4;
-	google.protobuf.Timestamp SubmitDate = 5;
+	google.protobuf.Timestamp submitDate = 5;
 }
 
 service UserManagementService {
@@ -38,6 +38,10 @@ service UserManagementService {
 	rpc GetUser (GetUserRequest) returns (GetUserResponse);
 
 	rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);
+
+	rpc InsertCategory (InsertCategoryRequest) returns (InsertCategoryResponse);
+
+	rpc DeleteCategoryFromUser (DeleteCategoryFromUserRequest) returns (DeleteCategoryFromUserResponse);
 }
 
 message LoginUserRequest {
@@ -84,5 +88,27 @@ message GetUsersRequest {}
 
 message GetUsersResponse {
 	repeated User user = 1;
+	string error = 2;
+}
+
+message InsertCategoryRequest {
+	string categoryId = 1;
+	string categoryType = 2;
+	string userId = 3;
+}
+
+message InsertCategoryResponse {
+	bool success = 1;
+	string error = 2;
+}
+
+message DeleteCategoryFromUserRequest {
+	string categoryId = 1;
+	string categoryType = 2;
+	string userId = 3;
+}
+
+message DeleteCategoryFromUserResponse {
+	bool success = 1;
 	string error = 2;
 }

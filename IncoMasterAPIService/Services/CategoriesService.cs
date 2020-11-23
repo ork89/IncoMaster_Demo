@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using IncoMasterAPIService.Interfaces;
+using Models;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IncoMasterAPIService.Services
 {
-    public class CategoriesService
+    public class CategoriesService : ICategoriesService
     {
         private readonly IMongoCollection<CategoriesModel> _categories;
 
@@ -28,15 +29,15 @@ namespace IncoMasterAPIService.Services
             return await _categories.Find<CategoriesModel>(c => c.Id == id).FirstOrDefaultAsync().ConfigureAwait(false);
         }
 
-        public async Task<CategoriesModel> CreateAsync(CategoriesModel course)
+        public async Task<CategoriesModel> CreateAsync(CategoriesModel category)
         {
-            await _categories.InsertOneAsync(course).ConfigureAwait(false);
-            return course;
+            await _categories.InsertOneAsync(category).ConfigureAwait(false);
+            return category;
         }
 
-        public async Task UpdateAsync(string id, CategoriesModel course)
+        public async Task UpdateAsync(CategoriesModel category)
         {
-            await _categories.ReplaceOneAsync(c => c.Id == id, course).ConfigureAwait(false);
+            await _categories.ReplaceOneAsync(c => c.Id == category.Id, category).ConfigureAwait(false);            
         }
 
         public async Task DeleteAsync(string id)

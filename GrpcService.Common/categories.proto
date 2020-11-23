@@ -1,0 +1,57 @@
+﻿syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+option csharp_namespace = "GrpcService.Common";
+
+package categories;
+
+message SingleCategory {
+	string id = 1;
+	string category = 2;
+	string title = 3;
+	double amount = 4;
+	google.protobuf.Timestamp SubmitDate = 5;
+}
+
+service CategoryManagementService {
+	rpc GetCategoryById(GetCategoryByIdRequest) returns (GetCategoryByIdResponse);
+	rpc AddNewCategory(AddNewCategoryRequest) returns (AddNewCategoryResponse);
+	rpc UpdateCategory(UpdateCategoryRequest) returns (UpdateCategoryResponse);
+	rpc DeleteCategory(DeleteCategoryRequest) returns (DeleteCategoryResponse);
+}
+
+message GetCategoryByIdRequest {
+	string id = 1;
+}
+
+message GetCategoryByIdResponse {
+	SingleCategory category = 1;
+}
+
+message AddNewCategoryRequest {
+	SingleCategory category = 1;
+}
+
+message AddNewCategoryResponse {
+	string categoryId = 1;
+	bool success = 2;
+	string error = 3;
+}
+
+message UpdateCategoryRequest {
+	SingleCategory category = 2;
+}
+
+message UpdateCategoryResponse {
+	bool success = 1;
+	string error = 2;
+}
+
+message DeleteCategoryRequest {
+	string id = 1;
+}
+
+message DeleteCategoryResponse {
+	bool success = 1;
+	string error = 2;
+}

@@ -14,18 +14,13 @@ using System.Windows.Shapes;
 namespace IncoMasterApp.Views
 {
     /// <summary>
-    /// Interaction logic for ExpensesControl.xaml
+    /// Interaction logic for Dialog.xaml
     /// </summary>
-    public partial class ExpensesView : UserControl
+    public partial class Dialog : Page
     {
-        public ExpensesView()
+        public Dialog()
         {
             InitializeComponent();
-        }
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if((sender as TextBox).Text == "0")
-                (sender as TextBox).Text = "";
         }
     }
 }

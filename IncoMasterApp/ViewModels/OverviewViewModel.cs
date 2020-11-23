@@ -29,7 +29,8 @@ namespace IncoMasterApp.ViewModels
 
             PointLabel = chartPoint => string.Format("{0} ({1:P})", chartPoint.Y, chartPoint.Participation);
 
-            InitializeUserData(_loggedUser);
+            if(_loggedUser != null && _loggedUser.Income != null)
+                InitializeUserData(_loggedUser);
         }
 
         #region Properties
@@ -236,7 +237,7 @@ namespace IncoMasterApp.ViewModels
         {
             foreach (var amount in _loggedUser.ExpensesList)
             {
-                TotalExpenses += amount.Amount;
+                TotalExpenses += Math.Round(amount.Amount, 2);
             }
         }
 
@@ -244,7 +245,7 @@ namespace IncoMasterApp.ViewModels
         {
             foreach (var amount in _loggedUser.SavingsList)
             {
-                TotalSavings += amount.Amount;
+                TotalSavings += Math.Round(amount.Amount, 2);
             }
         }
 
@@ -252,7 +253,7 @@ namespace IncoMasterApp.ViewModels
         {
             foreach (var amount in _loggedUser.LoansList)
             {
-                TotalLoans += amount.Amount;
+                TotalLoans += Math.Round(amount.Amount, 2);
             }
         }
 

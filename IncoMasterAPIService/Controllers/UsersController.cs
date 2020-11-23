@@ -16,12 +16,14 @@ namespace IncoMasterAPIService.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly CategoriesService _categoriesService;
         private readonly IAuthenticationService _authService;
         readonly SecureStringConverter _converter;
 
-        public UsersController(UserService service, IAuthenticationService authService)
+        public UsersController(UserService service, CategoriesService categoriesService, IAuthenticationService authService)
         {
             _userService = service;
+            _categoriesService = categoriesService;
             _authService = authService;
         }
 
@@ -43,11 +45,13 @@ namespace IncoMasterAPIService.Controllers
         {
             var accountExists = _userService.AuthenticateUser(email, password);
             var user = new UserModel();
+            
             if (accountExists)
                 user = _userService.GetAllAsync().Result.SingleOrDefault(e => e.Email == email && e.Password == _converter.ConvertToString(password));
 
             if (user != null)
                 return NotFound();
+
             var userId = int.Parse(HttpContext.User.Claims.SingleOrDefault(x => x.Type == "Email").Value.ToString());
             return Ok(userId);
         }
@@ -76,10 +80,68 @@ namespace IncoMasterAPIService.Controllers
         {
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
-            {
                 return NotFound();
-            }
+
+            InitUsersCategoriesLists(user);
+
             return Ok(user);
+        }
+
+        private async void InitUsersCategoriesLists(UserModel user)
+        {
+            var tempList = new List<CategoriesModel>();
+
+            if (user.Income.Count > 0)
+            {
+                foreach (var incomeId in user.Income)
+                {
+                    var income = await _categoriesService.GetByIdAsync(incomeId);
+                    if (income != null)
+                        tempList.Add(income);
+                }
+
+                user.IncomeList = tempList;
+                tempList.Clear();
+            }
+
+            if(user.Expenses.Count > 0)
+            {
+                foreach (var expensId in user.Expenses)
+                {
+                    var expense = await _categoriesService.GetByIdAsync(expensId);
+                    if (expense != null)
+                        tempList.Add(expense);
+                }
+
+                user.ExpensesList = tempList;
+                tempList.Clear();
+            }
+
+            if (user.Savings.Count > 0)
+            {
+                foreach (var savingsId in user.Savings)
+                {
+                    var savings = await _categoriesService.GetByIdAsync(savingsId);
+                    if (savings != null)
+                        tempList.Add(savings);
+                }
+
+                user.SavingsList = tempList;
+                tempList.Clear();
+            }
+
+            if (user.Loans.Count > 0)
+            {
+                foreach (var loanId in user.Loans)
+                {
+                    var loan = await _categoriesService.GetByIdAsync(loanId);
+                    if (loan != null)
+                        tempList.Add(loan);
+                }
+
+                user.LoansList = tempList;
+                tempList.Clear();
+            }
         }
 
         [HttpPost]
@@ -97,31 +159,54 @@ namespace IncoMasterAPIService.Controllers
         public async Task<IActionResult> Update(string id, UserModel updatedUser)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest();
-            }
 
             var queriedUser = await _userService.GetByIdAsync(id);
-            if (queriedUser == null)
-            {
+            
+            if (queriedUser == null)            
                 return NotFound();
-            }
 
             await _userService.UpdateAsync(id, updatedUser);
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
         [Authorize]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             var user = await _userService.GetByIdAsync(id);
+            
             if (user == null)
-            {
                 return NotFound();
-            }
+            
             await _userService.DeleteAsync(id);
             return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> InsertCategory(string categoryId, string categoryType, string userId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            await _userService.InsertCategoryAsync(categoryId, categoryType, userId);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(string categoryId, string categoryType, string userId)
+        {
+            var user = await _userService.GetByIdAsync(userId);
+            
+            if (user == null)
+                return NotFound();
+
+            var result = await _userService.DeleteCategoryAsync(categoryId, categoryType, userId);
+            
+            if(result == false)
+                return NoContent();
+
+            return Ok(result);
         }
     }
 }

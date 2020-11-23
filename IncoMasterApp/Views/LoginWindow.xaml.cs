@@ -24,8 +24,9 @@ namespace IncoMasterApp.Views
 
         private void exitBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
-            this.DataContext = new MainWindowViewModel();
+            //this.Close();
+            //this.DataContext = new MainWindowViewModel();
+            Application.Current.Shutdown();
         }
 
         private void passwordPb_PasswordChanged(object sender, RoutedEventArgs e)

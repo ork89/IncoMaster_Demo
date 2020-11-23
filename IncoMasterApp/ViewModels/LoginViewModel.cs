@@ -107,18 +107,16 @@ namespace IncoMasterApp.ViewModels
         private async void LoginUser(Window win)
         {
             MainWindowViewModel mVm = MainWindowViewModel.Instance;
-            OverviewViewModel oVm = new OverviewViewModel();
 
             var loggedUser = mVm.LoggedUser;
-            loggedUser = await CoreGrpcClient.LoginUser(Email, _converter.HashSecureString(Password));
-            RaisePropertyChange("LoggedUser");
+            loggedUser = await CoreGrpcClient.LoginUser(Email, _converter.HashSecureString(Password));            
 
             if (loggedUser != null)
             {
-                mVm.SelectedViewModel = oVm;
-                RaisePropertyChange("SelectedViewModel");
-
                 mVm.LoggedUser = loggedUser;
+                OnPropertyChanged("LoggedUser");
+                mVm.SelectedViewModel = new OverviewViewModel();
+                RaisePropertyChange("SelectedViewModel");
 
                 if(win != null) win.Close();
             }
