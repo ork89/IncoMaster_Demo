@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
 using System.Windows.Input;
 
 namespace IncoMasterApp.ViewModels
@@ -13,40 +12,31 @@ namespace IncoMasterApp.ViewModels
     public class IncomeViewModel : BaseViewModel
     {
         private const string DialogIdentifier = "RootDialogHost";
+        private const string EditDialogHostIdentifier = "EditDialogHost";
 
         public IncomeViewModel()
         {
             LoggedUser = MainWindowViewModel.Instance.LoggedUser;
-            _incomeList = new ObservableCollection<CategoriesModel>();
+            IncomeList = new ObservableCollection<CategoriesModel>();
+            IncomeSnackbarMessage = new SnackbarMessage();
 
-            if (LoggedUser != null)
+            if (LoggedUser != null && LoggedUser.IncomeList != null)
                 InitIncomeList(LoggedUser.IncomeList);
+
+            InitIncomeTypesList();
+            IncomeSubmitDate = DateTime.Today;
+            SelectedMonth = DateTime.Today.Month;
+            SelectedYear = DateTime.Today.Year;
 
             AddIncomeCommand = new RelayCommand(AddNewIncome, param => this.CanExecute);
             EditIncomeCommand = new RelayCommand(EditIncome, param => this.CanExecute);
             DeleteIncomeCommand = new RelayCommand(DeleteIncome, param => this.CanExecute);
             CloseSnackbarCommand = new RelayCommand(CloseSnackbar, param => this.CanExecute);
-
-            InitIncomeTypesList();
-            IncomeSubmitDate = DateTime.Today;
-            IncomeSnackbarMessage = new SnackbarMessage();
+            FilterListViewCommand = new RelayCommand(OnFilterListView, param => this.CanExecute);
+            ClearFilterCommand = new RelayCommand(ClearFilter, param => this.CanExecute);
         }
 
         #region Properties
-        private ObservableCollection<CategoriesModel> _incomeList;
-        public ObservableCollection<CategoriesModel> IncomeList
-        {
-            get { return _incomeList; }
-            set
-            {
-                if (value != _incomeList)
-                {
-                    _incomeList = value;
-                    RaisePropertyChange();
-                }
-            }
-        }
-
         private UserModel _loggedUser;
         public UserModel LoggedUser
         {
@@ -56,7 +46,21 @@ namespace IncoMasterApp.ViewModels
                 if (value != _loggedUser)
                 {
                     _loggedUser = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<CategoriesModel> _incomeList;
+        public ObservableCollection<CategoriesModel> IncomeList
+        {
+            get { return _incomeList; }
+            set
+            {
+                if (value != _incomeList)
+                {
+                    _incomeList = value;
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -70,7 +74,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _incomeTypes)
                 {
                     _incomeTypes = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -84,7 +88,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _selectedIncomeType)
                 {
                     _selectedIncomeType = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -98,7 +102,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _selectedRow)
                 {
                     _selectedRow = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -112,7 +116,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _submitDate)
                 {
                     _submitDate = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -126,7 +130,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _amount)
                 {
                     _amount = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -140,11 +144,10 @@ namespace IncoMasterApp.ViewModels
                 if (value != _incomeSnackbarMessage)
                 {
                     _incomeSnackbarMessage = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
-
 
         private bool _isSnackbarActive;
         public bool IsSnackbarActive
@@ -155,10 +158,30 @@ namespace IncoMasterApp.ViewModels
                 if (value != _isSnackbarActive)
                 {
                     _isSnackbarActive = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
+
+        private string _selectedIncomeTypeFilter;
+        public string SelectedIncomeTypeFilter
+        {
+            get { return _selectedIncomeTypeFilter; }
+            set
+            {
+                if (value != _selectedIncomeTypeFilter)
+                {
+                    _selectedIncomeTypeFilter = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public int SelectedMonth { get; set; }
+        public int SelectedYear { get; set; }
+
+        public List<int> Months { get { return base.MonthsList; } }
+        public List<int> Years { get { return base.YearsList; } }
 
 
         //public event EventHandler Close;
@@ -184,6 +207,8 @@ namespace IncoMasterApp.ViewModels
         public ICommand EditIncomeCommand { get; set; }
         public ICommand DeleteIncomeCommand { get; set; }
         public ICommand CloseSnackbarCommand { get; set; }
+        public ICommand FilterListViewCommand { get; set; }
+        public ICommand ClearFilterCommand { get; set; }
         #endregion Commands
 
         #region Methods
@@ -194,6 +219,20 @@ namespace IncoMasterApp.ViewModels
             {
                 IncomeList.Add(income);
             }
+        }
+
+        private void InitIncomeTypesList()
+        {
+            IncomeTypes = new ObservableCollection<string>
+            {
+                "",
+                "Salary",
+                "Second Income",
+                "One Time Payment",
+                "Rent",
+                "Scholarship",
+                "Other",
+            };
         }
 
         private async void AddNewIncome(object obj)
@@ -231,7 +270,7 @@ namespace IncoMasterApp.ViewModels
             IncomeSubmitDate = SelectedRow.SubmitDate;
 
             var categoryToUpdate = new CategoriesModel();
-            object dialogResult = await DialogHost.Show(this, DialogIdentifier);
+            object dialogResult = await DialogHost.Show(this, EditDialogHostIdentifier);
 
             if (dialogResult is bool boolResult && boolResult)
             {
@@ -255,8 +294,6 @@ namespace IncoMasterApp.ViewModels
                             income.Title = SelectedRow.Title;
                             income.Amount = SelectedRow.Amount;
                             income.SubmitDate = SelectedRow.SubmitDate;
-
-                            RaisePropertyChange();
                         }
 
                         break;
@@ -280,19 +317,6 @@ namespace IncoMasterApp.ViewModels
             }
         }
 
-        private void InitIncomeTypesList()
-        {
-            IncomeTypes = new ObservableCollection<string>
-            {
-                "Salary",
-                "Second Income",
-                "One Time Payment",
-                "Rent",
-                "Scholarship",
-                "Other",
-            };
-        }
-
         private void DisplaySnackbar(string content)
         {
             var title = string.IsNullOrEmpty(SelectedIncomeType) ? SelectedRow.Title : SelectedIncomeType;
@@ -300,7 +324,7 @@ namespace IncoMasterApp.ViewModels
             {
                 ActionContent = "OK",
                 ActionCommand = CloseSnackbarCommand,
-                Content = $"{title} {content}.", 
+                Content = $"{title} {content}.",
             };
 
             IsSnackbarActive = true;
@@ -309,6 +333,16 @@ namespace IncoMasterApp.ViewModels
         private void CloseSnackbar(object obj)
         {
             IsSnackbarActive = false;
+        }
+
+        private void OnFilterListView(object obj)
+        {
+            IncomeList = FilterListView("IncomeList", SelectedYear, SelectedMonth, SelectedIncomeTypeFilter, LoggedUser);
+        }
+
+        private void ClearFilter(object obj)
+        {
+            IncomeList = new ObservableCollection<CategoriesModel>(LoggedUser.IncomeList);
         }
 
         #endregion Methods

@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows;
 
 namespace IncoMasterApp.ViewModels
 {
     public class MainWindowViewModel : BaseViewModel
     {
-        CoreGrpcClient grpcClient;
-        private static MainWindowViewModel _instance = new MainWindowViewModel();
-        public static MainWindowViewModel Instance { get { return _instance; } }
+        public static MainWindowViewModel Instance { get; } = new MainWindowViewModel();
 
         public MainWindowViewModel()
         {
@@ -23,6 +22,9 @@ namespace IncoMasterApp.ViewModels
             SwitchToExpensesViewCommand = new RelayCommand(SwitchToExpensesView, param => this.CanExecute);
             SwitchToSavingsViewCommand = new RelayCommand(SwitchToSavingsView, param => this.CanExecute);
             SwitchToLoansViewCommand = new RelayCommand(SwitchToLoansView, param => this.CanExecute);
+            OpenUserMenuCommand = new RelayCommand(OpenUserMenu, param => this.CanExecute);
+            OpenSettingsMenuCommand = new RelayCommand(OpenSettingsMenu, param => this.CanExecute);
+            LogoutUserCommand = new RelayCommand(LogoutUser, param => this.CanExecute);
         }
 
         #region Commands
@@ -31,6 +33,9 @@ namespace IncoMasterApp.ViewModels
         public ICommand SwitchToExpensesViewCommand { get; set; }
         public ICommand SwitchToSavingsViewCommand { get; set; }
         public ICommand SwitchToLoansViewCommand { get; set; }
+        public ICommand OpenUserMenuCommand { get; set; }
+        public ICommand OpenSettingsMenuCommand { get; set; }
+        public ICommand LogoutUserCommand { get; set; }
         #endregion Commands
 
         #region Properties
@@ -38,13 +43,18 @@ namespace IncoMasterApp.ViewModels
         private object _selectedViewModel;
         public object SelectedViewModel
         {
-            get { return _selectedViewModel; }
+            get 
+            {
+                if (_selectedViewModel == null)
+                    _selectedViewModel = new OverviewViewModel();
+                return _selectedViewModel; 
+            }
             set
             {
                 if(value != _selectedViewModel)
                 {
                     _selectedViewModel = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -55,18 +65,27 @@ namespace IncoMasterApp.ViewModels
             get { return _loggedUser; }
             set
             {
-                if (LoggedUser == null && value != null)
-                    this.SwitchToHomeView(null);
-
                 if (value != _loggedUser)
                 {
                     _loggedUser = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
 
-        public bool IsLoading { get; set; }
+        private bool _isProgressbarVisible;
+        public bool IsProgressbarVisible
+        {
+            get { return _isProgressbarVisible; }
+            set
+            {
+                if (value != _isProgressbarVisible)
+                {
+                    _isProgressbarVisible = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
 
         private bool _canExecute = true;
         public bool CanExecute
@@ -86,6 +105,21 @@ namespace IncoMasterApp.ViewModels
         #endregion Properties
 
         #region CommandMethods
+
+        private void OpenUserMenu(object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OpenSettingsMenu(object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void LogoutUser(object obj)
+        {
+            throw new NotImplementedException();
+        }
 
         private void SwitchToHomeView(object obj)
         {

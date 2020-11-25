@@ -12,24 +12,29 @@ namespace IncoMasterApp.ViewModels
 {
     public class SavingsViewModel : BaseViewModel
     {
-        private const string DialogIdentifier = "RootDialogHost";
+        private const string RootDialogIdentifier = "RootDialogHost";
+        private const string EditDialogHostIdentifier = "EditDialogHost";
 
         public SavingsViewModel()
         {
             LoggedUser = MainWindowViewModel.Instance.LoggedUser;
             _savingsList = new ObservableCollection<CategoriesModel>();
+            SavingsSnackbarMessage = new SnackbarMessage();
 
-            if (LoggedUser != null)
+            if (LoggedUser != null && LoggedUser.SavingsList != null)
                 InitSavingsList(LoggedUser.SavingsList);
+
+            InitSavingsTypesList();
+            SavingsSubmitDate = DateTime.Today.Date;
+            SelectedMonth = DateTime.Today.Month;
+            SelectedYear = DateTime.Today.Year;
 
             AddSavingsCommand = new RelayCommand(AddNewSavings, param => this.CanExecute);
             EditSavingsCommand = new RelayCommand(EditSavings, param => this.CanExecute);
             DeleteSavingsCommand = new RelayCommand(DeleteSavings, param => this.CanExecute);
             CloseSnackbarCommand = new RelayCommand(CloseSnackbar, param => this.CanExecute);
-
-            InitSavingsTypesList();
-            SavingsSubmitDate = DateTime.Today.Date;
-            IncomeSnackbarMessage = new SnackbarMessage();
+            FilterListViewCommand = new RelayCommand(OnFilterListView, param => this.CanExecute);
+            ClearFilterCommand = new RelayCommand(ClearFilter, param => this.CanExecute);
         }
 
         #region Properties
@@ -42,7 +47,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _savingsList)
                 {
                     _savingsList = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -56,7 +61,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _loggedUser)
                 {
                     _loggedUser = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -70,7 +75,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _savingsTypes)
                 {
                     _savingsTypes = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -84,7 +89,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _selectedSavingsType)
                 {
                     _selectedSavingsType = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -98,7 +103,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _selectedRow)
                 {
                     _selectedRow = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -113,7 +118,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _submitDate)
                 {
                     _submitDate = value.Date;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -127,21 +132,21 @@ namespace IncoMasterApp.ViewModels
                 if (value != _amount)
                 {
                     _amount = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
 
-        private SnackbarMessage _incomeSnackbarMessage;
-        public SnackbarMessage IncomeSnackbarMessage
+        private SnackbarMessage _savingsSnackbarMessage;
+        public SnackbarMessage SavingsSnackbarMessage
         {
-            get { return _incomeSnackbarMessage; }
+            get { return _savingsSnackbarMessage; }
             set
             {
-                if (value != _incomeSnackbarMessage)
+                if (value != _savingsSnackbarMessage)
                 {
-                    _incomeSnackbarMessage = value;
-                    RaisePropertyChange();
+                    _savingsSnackbarMessage = value;
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -156,10 +161,31 @@ namespace IncoMasterApp.ViewModels
                 if (value != _isSnackbarActive)
                 {
                     _isSnackbarActive = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
+
+        private string _selectedSavingsTypeFilter;
+        public string SelectedSavingsTypeFilter
+        {
+            get { return _selectedSavingsTypeFilter; }
+            set
+            {
+                if (value != _selectedSavingsTypeFilter)
+                {
+                    _selectedSavingsTypeFilter = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public int SelectedMonth { get; set; }
+        public int SelectedYear { get; set; }
+
+        public List<int> Months { get { return base.MonthsList; } }
+        public List<int> Years { get { return base.YearsList; } }
+
 
         //public event EventHandler Close;
         private bool _canExecute = true;
@@ -183,6 +209,8 @@ namespace IncoMasterApp.ViewModels
         public ICommand EditSavingsCommand { get; set; }
         public ICommand DeleteSavingsCommand { get; set; }
         public ICommand CloseSnackbarCommand { get; set; }
+        public ICommand FilterListViewCommand { get; set; }
+        public ICommand ClearFilterCommand { get; set; }
         #endregion Commands
 
         #region Methods
@@ -197,7 +225,7 @@ namespace IncoMasterApp.ViewModels
 
         private async void AddNewSavings(object obj)
         {
-            object dialogResult = await DialogHost.Show(this, DialogIdentifier);
+            object dialogResult = await DialogHost.Show(this, RootDialogIdentifier);
 
             if (dialogResult is bool boolResult && boolResult)
             {
@@ -229,11 +257,10 @@ namespace IncoMasterApp.ViewModels
             SavingsAmount = SelectedRow.Amount;
             SavingsSubmitDate = SelectedRow.SubmitDate;
 
-            object dialogResult = await DialogHost.Show(this, DialogIdentifier);
+            object dialogResult = await DialogHost.Show(this, EditDialogHostIdentifier);
 
             if (dialogResult is bool boolResult && boolResult)
             {
-                //var savingsToUpdate = SavingsList.Find(x => x.Id == SelectedRow.Id);
                 var savingsToUpdate = SavingsList.Where(x => x.Id == SelectedRow.Id).SingleOrDefault();
 
                 savingsToUpdate.Title = SelectedSavingsType;
@@ -255,7 +282,7 @@ namespace IncoMasterApp.ViewModels
                             savings.Amount = SelectedRow.Amount;
                             savings.SubmitDate = SelectedRow.SubmitDate;
 
-                            RaisePropertyChange();
+                            RaisePropertyChanged();
                         }
 
                         break;
@@ -283,6 +310,7 @@ namespace IncoMasterApp.ViewModels
         {
             SavingsTypes = new ObservableCollection<string>
             {
+                "",
                 "Savings Account",
                 "High-Yield Savings Account",
                 "Stocks and Bonds",
@@ -294,7 +322,7 @@ namespace IncoMasterApp.ViewModels
         private void DisplaySnackbar(string content)
         {
             var title = string.IsNullOrEmpty(SelectedSavingsType) ? SelectedRow.Title : SelectedSavingsType;
-            IncomeSnackbarMessage = new SnackbarMessage
+            SavingsSnackbarMessage = new SnackbarMessage
             {
                 ActionContent = "OK",
                 ActionCommand = CloseSnackbarCommand,
@@ -309,6 +337,15 @@ namespace IncoMasterApp.ViewModels
             IsSnackbarActive = false;
         }
 
+        private void OnFilterListView(object obj)
+        {
+            SavingsList = FilterListView("SavingsList", SelectedYear, SelectedMonth, SelectedSavingsTypeFilter, LoggedUser);
+        }
+
+        private void ClearFilter(object obj)
+        {
+            SavingsList = new ObservableCollection<CategoriesModel>(LoggedUser.SavingsList);
+        }
         #endregion Methods
     }
 }

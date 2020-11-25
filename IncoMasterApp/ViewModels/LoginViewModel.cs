@@ -9,6 +9,8 @@ using DotNetCoreGrpcClient;
 using System.Security;
 using HelperClasses;
 using GalaSoft.MvvmLight.CommandWpf;
+using Models;
+using System.Threading.Tasks;
 
 namespace IncoMasterApp.ViewModels
 {
@@ -43,7 +45,7 @@ namespace IncoMasterApp.ViewModels
                 if(value != _email)
                 {
                     _email = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -58,7 +60,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _password)
                 {
                     _password = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -75,7 +77,7 @@ namespace IncoMasterApp.ViewModels
                 if(value != _errorMessage)
                 {
                     _errorMessage = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -108,15 +110,14 @@ namespace IncoMasterApp.ViewModels
         {
             MainWindowViewModel mVm = MainWindowViewModel.Instance;
 
-            var loggedUser = mVm.LoggedUser;
+            var loggedUser = new UserModel();
             loggedUser = await CoreGrpcClient.LoginUser(Email, _converter.HashSecureString(Password));            
 
-            if (loggedUser != null)
+            if (loggedUser != null && loggedUser.Id != null)
             {
                 mVm.LoggedUser = loggedUser;
                 OnPropertyChanged("LoggedUser");
-                mVm.SelectedViewModel = new OverviewViewModel();
-                RaisePropertyChange("SelectedViewModel");
+                mVm.IsProgressbarVisible = true;
 
                 if(win != null) win.Close();
             }
@@ -130,7 +131,7 @@ namespace IncoMasterApp.ViewModels
         {
             _password = pass.Copy();
             _password.MakeReadOnly();
-            RaisePropertyChange("ExtraLoginPass");
+            RaisePropertyChanged("ExtraLoginPass");
         }
         #endregion
     }

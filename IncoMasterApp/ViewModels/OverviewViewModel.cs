@@ -1,39 +1,66 @@
-﻿using Models;
-using System;
+﻿using IncoMasterApp.Views;
 using LiveCharts;
 using LiveCharts.Wpf;
+using Models;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows;
-using IncoMasterApp.Views;
 using System.Collections.ObjectModel;
-using IncoMasterApp.Interfaces;
 
 namespace IncoMasterApp.ViewModels
 {
     public class OverviewViewModel : BaseViewModel
     {
-        private static OverviewViewModel _overViewInstance = new OverviewViewModel();
-        public static OverviewViewModel OverViewInstance { get { return _overViewInstance; } }
-
         private readonly MainWindowViewModel _mainVm;
-        private readonly UserModel _loggedUser;
+        //private readonly UserModel _loggedUser;
 
         public OverviewViewModel(OverviewView overviewView = null)
         {
+            IsLoading = true;
             _mainVm = MainWindowViewModel.Instance;
-            _loggedUser = _mainVm.LoggedUser;
-            OverviewView = overviewView;
+            User = _mainVm.LoggedUser;
 
+            OverviewView = overviewView ?? new OverviewView();
             PointLabel = chartPoint => string.Format("{0} ({1:P})", chartPoint.Y, chartPoint.Participation);
 
-            if(_loggedUser != null && _loggedUser.Income != null)
-                InitializeUserData(_loggedUser);
+            if (User != null)
+            {
+                InitializeUserData(User);
+                IsLoading = false;
+            }
+
+            SelectedMonth = DateTime.Today.Month;
+            SelectedYear = DateTime.Today.Year;
         }
 
         #region Properties
+        private UserModel _user;
+        public UserModel User
+        {
+            get { return _user; }
+            set
+            {
+                if (value != _user)
+                {
+                    _user = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set
+            {
+                if (value != _isLoading)
+                {
+                    _isLoading = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         private string _userName;
         public string UserName
         {
@@ -43,7 +70,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _userName)
                 {
                     _userName = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -57,7 +84,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _balance)
                 {
                     _balance = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -65,13 +92,13 @@ namespace IncoMasterApp.ViewModels
         private double _totalIncome;
         public double TotalIncome
         {
-            get { return _totalIncome; }
+            get { return Math.Round(_totalIncome, 2); }
             set
             {
                 if (value != _totalIncome)
                 {
                     _totalIncome = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -79,13 +106,13 @@ namespace IncoMasterApp.ViewModels
         private double _totalExpenses;
         public double TotalExpenses
         {
-            get { return _totalExpenses; }
+            get { return Math.Round(_totalExpenses, 2); }
             set
             {
                 if (value != _totalExpenses)
                 {
                     _totalExpenses = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -93,13 +120,13 @@ namespace IncoMasterApp.ViewModels
         private double _totalSavings;
         public double TotalSavings
         {
-            get { return _totalSavings; }
+            get { return Math.Round(_totalSavings, 2); }
             set
             {
                 if (value != _totalSavings)
                 {
                     _totalSavings = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -107,13 +134,13 @@ namespace IncoMasterApp.ViewModels
         private double _totalLoans;
         public double TotalLoans
         {
-            get { return _totalLoans; }
+            get { return Math.Round(_totalLoans, 2); }
             set
             {
                 if (value != _totalLoans)
                 {
                     _totalLoans = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -127,7 +154,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _incomeValue)
                 {
                     _incomeValue = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -141,7 +168,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _expensesValue)
                 {
                     _expensesValue = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -155,7 +182,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _savingsValue)
                 {
                     _savingsValue = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -169,16 +196,22 @@ namespace IncoMasterApp.ViewModels
                 if (value != _loansValue)
                 {
                     _loansValue = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
 
         private double totalValues;
 
+        public int SelectedMonth { get; set; }
+        public int SelectedYear { get; set; }
+
+        public List<int> Months { get { return base.MonthsList; } }
+        public List<int> Years { get { return base.YearsList; } }
+
         public Func<ChartPoint, string> PointLabel { get; set; }
         private ObservableCollection<PieSeries> PieSeries { get; set; }
-        public OverviewView OverviewView { get; }
+        public OverviewView OverviewView { get; set; }
 
         private bool _canExecute = true;
         public bool CanExecute
@@ -195,65 +228,73 @@ namespace IncoMasterApp.ViewModels
             }
         }
 
-        #endregion
+        #endregion Properties
 
         #region Methods
         private void InitializeUserData(UserModel loggedUser)
         {
-            if (_loggedUser != null)
-            {
-                GetUserNameAndCurrentBalance();
-                GetTotalIncome();
-                GetTotalExpenses();
-                GetTotalSavings();
-                GetTotalLoans();
-                
-                CalculateValuesForPieChart();
-                RaisePropertyChange();
+            GetUserNameAndCurrentBalance();
+            GetTotalIncome();
+            GetTotalExpenses();
+            GetTotalSavings();
+            GetTotalLoans();
 
-                if (OverviewView != null)
-                    UpdatePieChart();
-            }
+            CalculateValuesForPieChart();
+
+            if (OverviewView != null)
+                UpdatePieChart();
         }
 
         private void GetUserNameAndCurrentBalance()
         {
-            if (_loggedUser != null)
+            if (User != null)
             {
-                UserName = $"{_loggedUser.FirstName} {_loggedUser.LastName}";
-                Balance = Math.Round(_loggedUser.Balance, 2);
+                UserName = $"{User.FirstName} {User.LastName}";
+                Balance = Math.Round(User.Balance, 2);
             }
         }
 
         private void GetTotalIncome()
         {
-            foreach (var amount in _loggedUser.IncomeList)
+            if (User.IncomeList != null)
             {
-                TotalIncome += amount.Amount;
+                foreach (var amount in User.IncomeList)
+                {
+                    TotalIncome += Math.Round(amount.Amount, 2);
+                }
             }
         }
 
         private void GetTotalExpenses()
         {
-            foreach (var amount in _loggedUser.ExpensesList)
+            if (User.ExpensesList != null)
             {
-                TotalExpenses += Math.Round(amount.Amount, 2);
+                foreach (var amount in User.ExpensesList)
+                {
+                    TotalExpenses += Math.Round(amount.Amount, 2);
+                }
             }
         }
 
         private void GetTotalSavings()
         {
-            foreach (var amount in _loggedUser.SavingsList)
+            if (User.SavingsList != null)
             {
-                TotalSavings += Math.Round(amount.Amount, 2);
+                foreach (var amount in User.SavingsList)
+                {
+                    TotalSavings += Math.Round(amount.Amount, 2);
+                }
             }
         }
 
         private void GetTotalLoans()
         {
-            foreach (var amount in _loggedUser.LoansList)
+            if (User.LoansList != null)
             {
-                TotalLoans += Math.Round(amount.Amount, 2);
+                foreach (var amount in User.LoansList)
+                {
+                    TotalLoans += Math.Round(amount.Amount, 2);
+                }
             }
         }
 
@@ -261,10 +302,10 @@ namespace IncoMasterApp.ViewModels
         {
             totalValues = TotalIncome + TotalExpenses + TotalSavings + TotalLoans;
 
-            IncomeValue = (_totalIncome / totalValues) * 100;
-            ExpensesValue = (_totalExpenses / totalValues) * 100;
-            SavingsValue = (_totalSavings / totalValues) * 100;
-            LoansValue = (_totalLoans / totalValues) * 100;
+            IncomeValue = (TotalIncome / totalValues) * 100;
+            ExpensesValue = (TotalExpenses / totalValues) * 100;
+            SavingsValue = (TotalSavings / totalValues) * 100;
+            LoansValue = (TotalLoans / totalValues) * 100;
         }
 
         public void UpdatePieChart()
@@ -276,10 +317,9 @@ namespace IncoMasterApp.ViewModels
                 new PieSeries { Title = "Savings", StrokeThickness = 0, Values = new ChartValues<double> { TotalSavings }, DataLabels = true, LabelPoint = PointLabel },
                 new PieSeries { Title = "Loans", StrokeThickness = 0, Values = new ChartValues<double> { TotalLoans }, DataLabels = true, LabelPoint = PointLabel }
             };
-
             OverviewView.Chart.Series.AddRange(PieSeries);
         }
 
-        #endregion
+        #endregion Methods
     }
 }

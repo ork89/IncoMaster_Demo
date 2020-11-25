@@ -68,13 +68,13 @@
 
         <!-- // Top Panel // -->
         <Grid x:Name="TopMenu" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="12" Background="#2CEAA3">
-            <Button x:Name="UserBtn" 
+            <!--<Button x:Name="UserBtn" 
                     VerticalAlignment="Top" 
                     HorizontalAlignment="Right"
                     Command="{Binding SwitchToIncomeViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
-                    Margin="0"
+                    Margin="0 0 10 0"
                     Width="30" 
                     Height="30"
                     Padding="0">
@@ -87,11 +87,74 @@
                     BorderBrush="{x:Null}" 
                     Width="30"
                     Height="30"
-                    Margin="0 0 25 0"
+                    Margin="0 0 35 0"
                     Padding="0">
                 <materialDesign:PackIcon Kind="Settings" Foreground="#FF28965A" Width="20" Height="20" />
-            </Button>
+            </Button>-->
+            <Menu IsMainMenu="True" 
+                  Background="{x:Null}" 
+                  BorderBrush="{x:Null}"
+                  HorizontalAlignment="Right" >
+                <MenuItem VerticalAlignment="Center" Width="55" Height="30">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="Settings" Foreground="#FF28965A" Width="20" Height="20" Margin="0 0 -2 -2" />
+                    </MenuItem.Icon>
+                    <MenuItem Header="Import Data"
+                              Background="{DynamicResource MaterialDesignPaper}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="Import" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Export Data"
+                              Background="{DynamicResource MaterialDesignPaper}" >
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="Export" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Prefrences"
+                              Background="{DynamicResource MaterialDesignPaper}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="SettingsOutline" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <!--<Separator />
+                    <MenuItem Header="Excellent"
+                              IsCheckable="True"
+                              IsChecked="True"
+                              Background="{DynamicResource MaterialDesignPaper}" />
+                    <MenuItem Header="Rubbish"
+                              IsCheckable="True" 
+                              Background="{DynamicResource MaterialDesignPaper}" />-->
+                    <Separator />
+                    <MenuItem Header="About"
+                              Background="{DynamicResource MaterialDesignPaper}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="About" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem VerticalAlignment="Center" Width="55" Height="30">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="UserOutline" Foreground="#FF28965A" Width="20" Height="20" />
+                    </MenuItem.Icon>
+                    <MenuItem Header="Logout"
+                              Background="{DynamicResource MaterialDesignPaper}"
+                              Command="{Binding LogoutUserCommand}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="Logout" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Exit"
+                              Background="{DynamicResource MaterialDesignPaper}"
+                              Command="{Binding LogoutAndExitCommand}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="ExitToApp" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
         </Grid>
+        <!-- // Top Panel // -->
 
         <!-- // Side Menu // -->
         <Grid x:Name="Menu" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="10" Background="#242331">
@@ -101,132 +164,113 @@
                     Grid.Row="4"
                     Grid.ColumnSpan="2"
                     Height="50"
+                    FontSize="16"
                     Command="{Binding SwitchToHomeViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
-                    Margin="0"
-                    Padding="0">
-                    <StackPanel Orientation="Horizontal" Margin="10 0">
+                    Margin="0 10 0 0"
+                    Padding="0"
+                    HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="20 0" HorizontalAlignment="Left">
                         <materialDesign:PackIcon Kind="Home" 
-                                                     Foreground="White" 
-                                                     Width="20" 
-                                                     Height="20" 
+                                                     Foreground="#FFF" 
+                                                     Width="25" 
+                                                     Height="25" 
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="HomeTxt" Text="Home" Margin="10" />
-                        <materialDesign:PackIcon Kind="ChevronRight"
-                                                 Foreground="White" 
-                                                     Width="20" 
-                                                     Height="20" 
-                                                     Margin="15 0" 
-                                                     VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
+                
                 <Button x:Name="IncomeBtn" 
                     Grid.Row="5"
                     Grid.ColumnSpan="2"
                     Height="50"
+                    FontSize="16"
                     Command="{Binding SwitchToIncomeViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
-                    Margin="0"
-                    Padding="0">
-                    <StackPanel Orientation="Horizontal" Margin="10 0">
+                    Margin="0 10 0 0"
+                    Padding="0"
+                    HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="20 0" HorizontalAlignment="Left">
                         <materialDesign:PackIcon Kind="Dollar" 
-                                                     Foreground="White" 
-                                                     Width="20" Height="20" 
+                                                     Foreground="#FFF" 
+                                                     Width="25"
+                                                     Height="25" 
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="IncomeTxt" Text="Income" Margin="10" />
-                        <materialDesign:PackIcon Kind="ChevronRight"
-                                                 Foreground="White" 
-                                                     Width="20" 
-                                                     Height="20" 
-                                                     Margin="15 0" 
-                                                     VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
+                
                 <Button x:Name="ExpnsesBtn" 
                     Grid.Row="6"
                     Grid.ColumnSpan="2"
                     Height="50"
+                    FontSize="16"
                     Command="{Binding SwitchToExpensesViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
-                    Margin="0"
-                    Padding="0">
-                    <StackPanel Orientation="Horizontal" Margin="10 0">
+                    Margin="0 10 0 0"
+                    Padding="0"
+                    HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="20 0" HorizontalAlignment="Left">
                         <materialDesign:PackIcon Kind="Cash100" 
-                                                     Foreground="White"
-                                                     Width="20" 
-                                                     Height="20"
+                                                     Foreground="#FFF"
+                                                     Width="25" 
+                                                     Height="25"
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="ExpensesTxt" Text="Expenses" Margin="10" />
-                        <materialDesign:PackIcon Kind="ChevronRight"
-                                                 Foreground="White" 
-                                                     Width="20" 
-                                                     Height="20" 
-                                                     Margin="15 0" 
-                                                     VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
+                
                 <Button x:Name="SavingsBtn" 
                     Grid.Row="7"
                     Grid.ColumnSpan="2"
                     Height="50"
+                    FontSize="16"
                     Command="{Binding SwitchToSavingsViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
-                    Margin="0"
-                    Padding="0">
-                    <StackPanel Orientation="Horizontal" Margin="10 0">
-                        <materialDesign:PackIcon Kind="PiggyBank" 
-                                                     Foreground="White" 
-                                                     Width="20" 
-                                                     Height="20" 
+                    Margin="0 10 0 0"
+                    Padding="0"
+                    HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="20 0" HorizontalAlignment="Left">
+                        <materialDesign:PackIcon Kind="BankPlus" 
+                                                     Foreground="#FFF" 
+                                                     Width="25" 
+                                                     Height="25" 
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="SavingsTxt" Text="Savings" Margin="10" />
-                        <materialDesign:PackIcon Kind="ChevronRight"
-                                                 Foreground="White" 
-                                                     Width="20" 
-                                                     Height="20" 
-                                                     Margin="15 0" 
-                                                     VerticalAlignment="Center"
-                                                     HorizontalContentAlignment="Right"
-                                                     HorizontalAlignment="Right" />
                     </StackPanel>
                 </Button>
+                
                 <Button x:Name="LoansBtn" 
                     Grid.Row="8"
                     Grid.ColumnSpan="2"
                     Height="50"
+                    FontSize="16"
                     Command="{Binding SwitchToLoansViewCommand}" 
                     Background="{x:Null}" 
                     BorderBrush="{x:Null}" 
-                    Margin="0"
+                    Margin="0 10 0 0"
                     Padding="0" 
                     HorizontalContentAlignment="Left">
-                    <StackPanel Orientation="Horizontal" Margin="10 0">
+                    <StackPanel Orientation="Horizontal" Margin="20 0" HorizontalAlignment="Left">
                         <materialDesign:PackIcon Kind="ArchiveArrowDown" 
-                                                     Foreground="White" 
-                                                     Width="20" 
-                                                     Height="20" 
+                                                     Foreground="#FFF" 
+                                                     Width="25" 
+                                                     Height="25" 
                                                      Margin="5" 
                                                      VerticalAlignment="Center" />
                         <TextBlock x:Name="LoansTxt" Text="Loans" Margin="10" />
-                        <materialDesign:PackIcon Kind="ChevronRight"
-                                                 Foreground="White" 
-                                                     Width="20" 
-                                                     Height="20" 
-                                                     Margin="15 0"
-                                                     VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </StackPanel>
         </Grid>
-
         <TextBlock Text="IncoMaster" 
                    Grid.Row="0" 
                    Grid.Column="0" 
@@ -234,6 +278,7 @@
                    Margin="20 0 0 4"
                    FontSize="20" 
                    Foreground="#FF28965A" />
+        <!-- // Side Menu // -->
         
         <!--// App Body //-->
         <Grid x:Name="AppBody" 
@@ -242,8 +287,8 @@
               Grid.RowSpan="9" 
               Grid.ColumnSpan="10" 
               Background="Transparent">
-            <ContentControl x:Name="views" Content="{Binding SelectedViewModel, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
-
+            <ContentControl x:Name="views" Content="{Binding SelectedViewModel, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
+        <!--// App Body //-->
     </Grid>
 </Window>

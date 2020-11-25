@@ -41,7 +41,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _firstName)
                 {
                     _firstName = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _lastName)
                 {
                     _lastName = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -72,7 +72,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _email)
                 {
                     _email = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -88,7 +88,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _password)
                 {
                     _password = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -104,7 +104,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _confPassword)
                 {
                     _confPassword = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -176,14 +176,14 @@ namespace IncoMasterApp.ViewModels
         {
             _password = pass.Copy();
             _password.MakeReadOnly();
-            RaisePropertyChange("ExtraPass");
+            RaisePropertyChanged("ExtraPass");
         }
 
         public void SetConfPassword(SecureString pass)
         {
             _confPassword = pass.Copy();
             _confPassword.MakeReadOnly();
-            RaisePropertyChange("ExtraConfPass");
+            RaisePropertyChanged("ExtraConfPass");
         }
 
         public string ValidatePasswords(string propertyName)

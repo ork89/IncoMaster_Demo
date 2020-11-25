@@ -24,7 +24,7 @@
                    Foreground="#FF2CEAA3" 
                    HorizontalAlignment="Center"
                    VerticalAlignment="Top"
-                   Margin="0 30" />
+                   Margin="0 70 0 0" />
         <StackPanel Orientation="Vertical">
             <materialDesign:Card Background="{DynamicResource MaterialDesignBackground}"
                                  Foreground="{DynamicResource PrimaryHueLightForegroundBrush}"
@@ -37,7 +37,7 @@
                                FontSize="20"
                                Margin="10 10 0 0"
                                Foreground="#242331" />
-                    <TextBlock Text="{Binding Path=Balance,
+                    <TextBlock Text="{Binding Path=User.Balance,
                                               UpdateSourceTrigger=PropertyChanged,
                                               NotifyOnSourceUpdated=True, Mode=TwoWay}" 
                            FontSize="20"
@@ -131,6 +131,50 @@
 
         <StackPanel Grid.Row="0"
                     Grid.Column="1"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Center"
+                    Margin="0 20 0 0">
+            <ComboBox materialDesign:HintAssist.Hint="Month"
+                      ItemsSource="{Binding Months}"
+                      SelectedItem="{Binding SelectedMonth}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                      HorizontalContentAlignment="Center"
+                      Margin="20 0 0 0"
+                      Width="70">
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <ComboBox materialDesign:HintAssist.Hint="Year"
+                      ItemsSource="{Binding Years}"
+                      SelectedItem="{Binding SelectedYear}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                      HorizontalContentAlignment="Center"
+                      Margin="20 0 0 0"
+                      Width="100">
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <Button x:Name="OverviewDispalyBtn"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Height="30"
+                    Width="90"
+                    BorderThickness="0"
+                    Margin="25 10 0 0"
+                    Padding="0"
+                    Command="{Binding DisplaySelectedTimePeriodCommand}">
+                <TextBlock Text="Display" />
+            </Button>
+        </StackPanel>
+
+        <StackPanel Grid.Row="0"
+                    Grid.Column="1"
                     Margin="0 180 40 0">
             <lvc:PieChart x:Name="OverviewPieChart"
                           LegendLocation="Left" 
@@ -142,5 +186,16 @@
                           Height="250"
                           Width="250" />
         </StackPanel>
+        <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                     Value="35"
+                     Grid.Row="0"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     Width="45"
+                     Height="45"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     IsIndeterminate="True" />
     </Grid>
 </UserControl>

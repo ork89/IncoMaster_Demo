@@ -12,23 +12,28 @@ namespace IncoMasterApp.ViewModels
     public class ExpensesViewModel : BaseViewModel
     {
         private const string DialogIdentifier = "RootDialogHost";
+        private const string EditDialogHostIdentifier = "EditDialogHost";
 
         public ExpensesViewModel()
         {
             LoggedUser = MainWindowViewModel.Instance.LoggedUser;
-            _expensesList = new ObservableCollection<CategoriesModel>();
+            ExpensesList = new ObservableCollection<CategoriesModel>();
+            ExpensesSnackbarMessage = new SnackbarMessage();
 
-            if (LoggedUser != null)
+            if (LoggedUser != null && LoggedUser.ExpensesList != null)
                 InitExpensesList(LoggedUser.ExpensesList);
+
+            InitExpensesTypesList();
+            ExpensesSubmitDate = DateTime.Today.Date;
+            SelectedMonth = DateTime.Today.Month;
+            SelectedYear = DateTime.Today.Year;
 
             AddExpensesCommand = new RelayCommand(AddNewExpenses, param => this.CanExecute);
             EditExpensesCommand = new RelayCommand(EditExpenses, param => this.CanExecute);
             DeleteExpensesCommand = new RelayCommand(DeleteExpenses, param => this.CanExecute);
             CloseSnackbarCommand = new RelayCommand(CloseSnackbar, param => this.CanExecute);
-
-            InitExpensesTypesList();
-            ExpensesSubmitDate = DateTime.Today.Date;
-            IncomeSnackbarMessage = new SnackbarMessage();
+            FilterListViewCommand = new RelayCommand(OnFilterListView, param => this.CanExecute);
+            ClearFilterCommand = new RelayCommand(ClearFilter, param => this.CanExecute);
         }
 
         #region Properties
@@ -36,13 +41,17 @@ namespace IncoMasterApp.ViewModels
         private ObservableCollection<CategoriesModel> _expensesList;
         public ObservableCollection<CategoriesModel> ExpensesList
         {
-            get { return _expensesList; }
+            get 
+            {
+                if (_expensesList == null) return new ObservableCollection<CategoriesModel>();
+                return _expensesList; 
+            }
             set
             {
                 if (value != _expensesList)
                 {
                     _expensesList = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -56,7 +65,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _loggedUser)
                 {
                     _loggedUser = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -70,7 +79,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _expensesTypes)
                 {
                     _expensesTypes = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -84,7 +93,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _selectedExpensesType)
                 {
                     _selectedExpensesType = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -98,7 +107,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _selectedRow)
                 {
                     _selectedRow = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -113,7 +122,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _submitDate)
                 {
                     _submitDate = value.Date;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -127,25 +136,24 @@ namespace IncoMasterApp.ViewModels
                 if (value != _amount)
                 {
                     _amount = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
 
-        private SnackbarMessage _incomeSnackbarMessage;
-        public SnackbarMessage IncomeSnackbarMessage
+        private SnackbarMessage _expensesSnackbarMessage;
+        public SnackbarMessage ExpensesSnackbarMessage
         {
-            get { return _incomeSnackbarMessage; }
+            get { return _expensesSnackbarMessage; }
             set
             {
-                if (value != _incomeSnackbarMessage)
+                if (value != _expensesSnackbarMessage)
                 {
-                    _incomeSnackbarMessage = value;
-                    RaisePropertyChange();
+                    _expensesSnackbarMessage = value;
+                    RaisePropertyChanged();
                 }
             }
         }
-
 
         private bool _isSnackbarActive;
         public bool IsSnackbarActive
@@ -156,10 +164,30 @@ namespace IncoMasterApp.ViewModels
                 if (value != _isSnackbarActive)
                 {
                     _isSnackbarActive = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
+        
+        private string _selectedExpenseTypeFilter;
+        public string SelectedExpenseTypeFilter
+        {
+            get { return _selectedExpenseTypeFilter; }
+            set
+            {
+                if (value != _selectedExpenseTypeFilter)
+                {
+                    _selectedExpenseTypeFilter = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public int SelectedMonth { get; set; }
+        public int SelectedYear { get; set; }
+
+        public List<int> Months { get { return base.MonthsList; } }
+        public List<int> Years { get { return base.YearsList; } }
 
         //public event EventHandler Close;
         private bool _canExecute = true;
@@ -183,6 +211,8 @@ namespace IncoMasterApp.ViewModels
         public ICommand EditExpensesCommand { get; set; }
         public ICommand DeleteExpensesCommand { get; set; }
         public ICommand CloseSnackbarCommand { get; set; }
+        public ICommand FilterListViewCommand { get; set; }
+        public ICommand ClearFilterCommand { get; set; }
         #endregion Commands
 
         #region Methods
@@ -229,12 +259,11 @@ namespace IncoMasterApp.ViewModels
             ExpensesAmount = SelectedRow.Amount;
             ExpensesSubmitDate = SelectedRow.SubmitDate;
 
-            object dialogResult = await DialogHost.Show(this, DialogIdentifier);
+            object dialogResult = await DialogHost.Show(this, EditDialogHostIdentifier);
 
             if (dialogResult is bool boolResult && boolResult)
             {
-                //var expensesToUpdate = ExpensesList.Find(x => x.Id == SelectedRow.Id);
-                var expensesToUpdate = ExpensesList.Where(x => x.Id == SelectedRow.Id).SingleOrDefault();
+               var expensesToUpdate = ExpensesList.Where(x => x.Id == SelectedRow.Id).SingleOrDefault();
 
                 expensesToUpdate.Title = SelectedExpensesType;
                 expensesToUpdate.Amount = ExpensesAmount;
@@ -253,8 +282,6 @@ namespace IncoMasterApp.ViewModels
                             expense.Title = SelectedRow.Title;
                             expense.Amount = SelectedRow.Amount;
                             expense.SubmitDate = SelectedRow.SubmitDate;
-
-                            RaisePropertyChange();
                         }
 
                         break;
@@ -282,6 +309,7 @@ namespace IncoMasterApp.ViewModels
         {
             ExpensesTypes = new ObservableCollection<string>
             {
+                "",
                 "Home",
                 "Family",
                 "Transportaion",
@@ -298,7 +326,7 @@ namespace IncoMasterApp.ViewModels
         private void DisplaySnackbar(string content)
         {
             var title = string.IsNullOrEmpty(SelectedExpensesType) ? SelectedRow.Title : SelectedExpensesType;
-            IncomeSnackbarMessage = new SnackbarMessage
+            ExpensesSnackbarMessage = new SnackbarMessage
             {
                 ActionContent = "OK",
                 ActionCommand = CloseSnackbarCommand,
@@ -313,6 +341,15 @@ namespace IncoMasterApp.ViewModels
             IsSnackbarActive = false;
         }
 
+        private void OnFilterListView(object obj)
+        {
+            ExpensesList = FilterListView("ExpensesList", SelectedYear, SelectedMonth, SelectedExpenseTypeFilter, LoggedUser);
+        }
+
+        private void ClearFilter(object obj)
+        {
+            ExpensesList = new ObservableCollection<CategoriesModel>(LoggedUser.ExpensesList);
+        }
         #endregion Methods
     }
 }

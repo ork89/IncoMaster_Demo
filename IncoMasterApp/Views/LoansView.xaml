@@ -23,17 +23,87 @@
                    FontFamily="Helvetica"
                    Grid.ColumnSpan="2"
                    Foreground="#FF2CEAA3" 
+                   Margin="0 20 0 0"
                    HorizontalAlignment="Center" 
                    VerticalAlignment="Top"/>
+
+        <!--// Filter //-->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Margin="0 90 20 0"
+                    Grid.Row="0"
+                    Grid.ColumnSpan="2">
+            <ComboBox materialDesign:HintAssist.Hint="Month"
+                      ItemsSource="{Binding MonthsList}"
+                      SelectedItem="{Binding SelectedMonth}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                      HorizontalContentAlignment="Center"
+                      Margin="20 0 0 0"
+                      Width="70">
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <ComboBox materialDesign:HintAssist.Hint="Year"
+                      ItemsSource="{Binding YearsList}"
+                      SelectedItem="{Binding SelectedYear}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                      HorizontalContentAlignment="Center"
+                      Margin="20 0 20 0"
+                      Width="100">
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <ComboBox materialDesign:HintAssist.Hint="Loan Type"
+                      ItemsSource="{Binding LoansTypes}"
+                      SelectedItem="{Binding SelectedLoanTypeFilter}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                      HorizontalContentAlignment="Center"
+                      VerticalAlignment="Top"
+                      Margin="0 0 20 0"
+                      Width="100">
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            <Button x:Name="LoansFilterBtn"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Height="30"
+                    Width="70"
+                    BorderThickness="0"
+                    Margin="0 10 0 0"
+                    Command="{Binding FilterListViewCommand}">
+                <TextBlock Text="Filter" />
+            </Button>
+            <Button x:Name="LoansClearFilterBtn"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Height="30"
+                    Width="70"
+                    BorderThickness="0"
+                    Margin="0 10 0 0"
+                    Command="{Binding ClearFilterCommand}">
+                <TextBlock Text="Clear" />
+            </Button>
+        </StackPanel>
+        <!--// Filter //-->
 
         <ListView ItemsSource="{Binding LoansList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                   SelectedItem="{Binding SelectedRow}"
                   Grid.Row="1"
                   Grid.ColumnSpan="2"
                   Width="400"
-                  Margin="30 0 0 0"
+                  Margin="3 40 0 0"
                   ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                  HorizontalAlignment="Left">
+                  materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True"
+                  HorizontalAlignment="Center">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Title}"
@@ -46,7 +116,7 @@
             </ListView.View>
         </ListView>
 
-        <materialDesign:DialogHost Identifier="RootDialogHost" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+        <materialDesign:DialogHost Identifier="RootDialogHost" CloseOnClickAway="True" HorizontalAlignment="Center" VerticalAlignment="Bottom">
             <materialDesign:DialogHost.DialogContentTemplate>
                 <DataTemplate DataType="local:LoansViewModel">
                     <StackPanel Margin="20" MinWidth="300">
@@ -84,7 +154,7 @@
             </materialDesign:DialogHost.DialogContentTemplate>
         </materialDesign:DialogHost>
 
-        <materialDesign:DialogHost HorizontalAlignment="Center" VerticalAlignment="Bottom">
+        <materialDesign:DialogHost Identifier="EditDialogHost" CloseOnClickAway="True" HorizontalAlignment="Center" VerticalAlignment="Bottom">
             <materialDesign:DialogHost.DialogContentTemplate>
                 <DataTemplate DataType="local:LoansViewModel">
                     <StackPanel Margin="20" MinWidth="300">
@@ -111,7 +181,11 @@
                             </Grid.ColumnDefinitions>
 
                             <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatAccentButton}" IsCancel="True" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
-                            <Button Content="Edit" Grid.Column="1" IsDefault="True" Command="{Binding EditLoansCommand}" />
+                            <Button Content="Edit" Grid.Column="1" IsDefault="True" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" >
+                                <Button.CommandParameter>
+                                    <system:Boolean>True</system:Boolean>
+                                </Button.CommandParameter>
+                            </Button>
 
                         </Grid>
                     </StackPanel>
@@ -119,7 +193,7 @@
             </materialDesign:DialogHost.DialogContentTemplate>
         </materialDesign:DialogHost>
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0 30" Grid.Row="1">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0 30 0 70" Grid.Row="1" Grid.ColumnSpan="2">
             <Button x:Name="LoansAddBtn"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
                         Height="30"
@@ -153,7 +227,7 @@
                                  Grid.ColumnSpan="2"
                                  VerticalAlignment="Bottom"
                                  HorizontalAlignment="Center"
-                                 Message="{Binding IncomeSnackbarMessage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                 Message="{Binding LoansSnackbarMessage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                  IsActive="{Binding IsSnackbarActive, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
     </Grid>
 </UserControl>

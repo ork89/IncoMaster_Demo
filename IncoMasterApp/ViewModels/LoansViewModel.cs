@@ -13,23 +13,28 @@ namespace IncoMasterApp.ViewModels
     public class LoansViewModel : BaseViewModel
     {
         private const string DialogIdentifier = "RootDialogHost";
+        private const string EditDialogHostIdentifier = "EditDialogHost";
 
         public LoansViewModel()
         {
             LoggedUser = MainWindowViewModel.Instance.LoggedUser;
             _loansList = new ObservableCollection<CategoriesModel>();
+            LoansSnackbarMessage = new SnackbarMessage();
 
-            if (LoggedUser != null)
+            if (LoggedUser != null && LoggedUser.LoansList != null)
                 InitLoansList(LoggedUser.LoansList);
+
+            InitLoansTypesList();
+            LoansSubmitDate = DateTime.Today.Date;
+            SelectedMonth = DateTime.Today.Month;
+            SelectedYear = DateTime.Today.Year;
 
             AddLoansCommand = new RelayCommand(AddNewLoans, param => this.CanExecute);
             EditLoansCommand = new RelayCommand(EditLoans, param => this.CanExecute);
             DeleteLoansCommand = new RelayCommand(DeleteLoans, param => this.CanExecute);
             CloseSnackbarCommand = new RelayCommand(CloseSnackbar, param => this.CanExecute);
-
-            InitLoansTypesList();
-            LoansSubmitDate = DateTime.Today.Date;
-            IncomeSnackbarMessage = new SnackbarMessage();
+            FilterListViewCommand = new RelayCommand(OnFilterListView, param => this.CanExecute);
+            ClearFilterCommand = new RelayCommand(ClearFilter, param => this.CanExecute);
         }
 
         #region Properties
@@ -42,7 +47,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _loansList)
                 {
                     _loansList = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -56,7 +61,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _loggedUser)
                 {
                     _loggedUser = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -70,7 +75,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _loansTypes)
                 {
                     _loansTypes = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -84,7 +89,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _selectedLoansType)
                 {
                     _selectedLoansType = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -98,7 +103,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _selectedRow)
                 {
                     _selectedRow = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -113,7 +118,7 @@ namespace IncoMasterApp.ViewModels
                 if (value != _submitDate)
                 {
                     _submitDate = value.Date;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -127,21 +132,21 @@ namespace IncoMasterApp.ViewModels
                 if (value != _amount)
                 {
                     _amount = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
 
-        private SnackbarMessage _incomeSnackbarMessage;
-        public SnackbarMessage IncomeSnackbarMessage
+        private SnackbarMessage _loansSnackbarMessage;
+        public SnackbarMessage LoansSnackbarMessage
         {
-            get { return _incomeSnackbarMessage; }
+            get { return _loansSnackbarMessage; }
             set
             {
-                if (value != _incomeSnackbarMessage)
+                if (value != _loansSnackbarMessage)
                 {
-                    _incomeSnackbarMessage = value;
-                    RaisePropertyChange();
+                    _loansSnackbarMessage = value;
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -156,10 +161,30 @@ namespace IncoMasterApp.ViewModels
                 if (value != _isSnackbarActive)
                 {
                     _isSnackbarActive = value;
-                    RaisePropertyChange();
+                    RaisePropertyChanged();
                 }
             }
         }
+
+        private string _selectedLoanTypeFilter;
+        public string SelectedLoanTypeFilter
+        {
+            get { return _selectedLoanTypeFilter; }
+            set
+            {
+                if (value != _selectedLoanTypeFilter)
+                {
+                    _selectedLoanTypeFilter = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public int SelectedMonth { get; set; }
+        public int SelectedYear { get; set; }
+
+        public List<int> Months { get { return base.MonthsList; } }
+        public List<int> Years { get { return base.YearsList; } }
 
         //public event EventHandler Close;
         private bool _canExecute = true;
@@ -183,6 +208,8 @@ namespace IncoMasterApp.ViewModels
         public ICommand EditLoansCommand { get; set; }
         public ICommand DeleteLoansCommand { get; set; }
         public ICommand CloseSnackbarCommand { get; set; }
+        public ICommand FilterListViewCommand { get; set; }
+        public ICommand ClearFilterCommand { get; set; }
         #endregion Commands
 
         #region Methods
@@ -229,7 +256,7 @@ namespace IncoMasterApp.ViewModels
             LoansAmount = SelectedRow.Amount;
             LoansSubmitDate = SelectedRow.SubmitDate;
 
-            object dialogResult = await DialogHost.Show(this, DialogIdentifier);
+            object dialogResult = await DialogHost.Show(this, EditDialogHostIdentifier);
 
             if (dialogResult is bool boolResult && boolResult)
             {
@@ -241,24 +268,10 @@ namespace IncoMasterApp.ViewModels
 
                 var result = await CoreGrpcClient.UpdateCategory(loansToUpdate, loansToUpdate.Id);
 
-                //if result is empty it means that theres no error.
+                //if result is empty it means that theres no error.                
                 if (string.IsNullOrEmpty(result))
                 {
                     DisplaySnackbar("Updated.");
-
-                    foreach (var loan in LoansList)
-                    {
-                        if (loan.Id == SelectedRow.Id)
-                        {
-                            loan.Title = SelectedRow.Title;
-                            loan.Amount = SelectedRow.Amount;
-                            loan.SubmitDate = SelectedRow.SubmitDate;
-
-                            RaisePropertyChange();
-                        }
-
-                        break;
-                    }
                 }
             }
 
@@ -282,6 +295,7 @@ namespace IncoMasterApp.ViewModels
         {
             LoansTypes = new ObservableCollection<string>
             {
+                "",
                 "Short Term",
                 "Business Loan",
                 "Home Refinancing",
@@ -293,7 +307,7 @@ namespace IncoMasterApp.ViewModels
         private void DisplaySnackbar(string content)
         {
             var title = string.IsNullOrEmpty(SelectedLoansType) ? SelectedRow.Title : SelectedLoansType;
-            IncomeSnackbarMessage = new SnackbarMessage
+            LoansSnackbarMessage = new SnackbarMessage
             {
                 ActionContent = "OK",
                 ActionCommand = CloseSnackbarCommand,
@@ -308,6 +322,15 @@ namespace IncoMasterApp.ViewModels
             IsSnackbarActive = false;
         }
 
+        private void OnFilterListView(object obj)
+        {
+            LoansList = FilterListView("LoansList", SelectedYear, SelectedMonth, SelectedLoanTypeFilter, LoggedUser);
+        }
+
+        private void ClearFilter(object obj)
+        {
+            LoansList = new ObservableCollection<CategoriesModel>(LoggedUser.LoansList);
+        }
         #endregion Methods
     }
 }
