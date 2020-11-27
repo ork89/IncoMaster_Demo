@@ -286,7 +286,7 @@ namespace IncoMasterApp.ViewModels
                 if (string.IsNullOrEmpty(result))
                 {
                     DisplaySnackbar("Updated.");
-
+                    var tempList = new ObservableCollection<CategoriesModel>();
                     foreach (var income in IncomeList)
                     {
                         if (income.Id == SelectedRow.Id)
@@ -295,9 +295,11 @@ namespace IncoMasterApp.ViewModels
                             income.Amount = SelectedRow.Amount;
                             income.SubmitDate = SelectedRow.SubmitDate;
                         }
-
+                        tempList = IncomeList;
                         break;
                     }
+                    IncomeList = new ObservableCollection<CategoriesModel>(tempList);
+                    ClearSelectedProperties();
                 }
             }
 
@@ -345,6 +347,13 @@ namespace IncoMasterApp.ViewModels
             IncomeList = new ObservableCollection<CategoriesModel>(LoggedUser.IncomeList);
         }
 
+        private void ClearSelectedProperties()
+        {
+
+            SelectedIncomeType = string.Empty;
+            IncomeAmount = 0;
+            IncomeSubmitDate = DateTime.Today.Date.Date;
+        }
         #endregion Methods
     }
 }

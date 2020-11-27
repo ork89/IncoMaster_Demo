@@ -268,10 +268,25 @@ namespace IncoMasterApp.ViewModels
 
                 var result = await CoreGrpcClient.UpdateCategory(loansToUpdate, loansToUpdate.Id);
 
-                //if result is empty it means that theres no error.                
+                //if result is empty it means that theres no error.
                 if (string.IsNullOrEmpty(result))
                 {
                     DisplaySnackbar("Updated.");
+                    var tempList = new ObservableCollection<CategoriesModel>();
+
+                    foreach (var loan in LoansList)
+                    {
+                        if (loan.Id == SelectedRow.Id)
+                        {
+                            loan.Title = SelectedRow.Title;
+                            loan.Amount = SelectedRow.Amount;
+                            loan.SubmitDate = SelectedRow.SubmitDate;
+                        }
+                        tempList = LoansList;
+                        break;
+                    }
+                    LoansList = new ObservableCollection<CategoriesModel>(tempList);
+                    ClearSelectedProperties();
                 }
             }
 
@@ -330,6 +345,14 @@ namespace IncoMasterApp.ViewModels
         private void ClearFilter(object obj)
         {
             LoansList = new ObservableCollection<CategoriesModel>(LoggedUser.LoansList);
+        }
+
+        private void ClearSelectedProperties()
+        {
+
+            SelectedLoansType = string.Empty;
+            LoansAmount = 0;
+            LoansSubmitDate = DateTime.Today.Date.Date;
         }
         #endregion Methods
     }

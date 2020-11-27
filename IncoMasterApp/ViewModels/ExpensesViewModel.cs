@@ -275,6 +275,8 @@ namespace IncoMasterApp.ViewModels
                 if (string.IsNullOrEmpty(result))
                 {
                     DisplaySnackbar("Updated.");
+                    var tempList = new ObservableCollection<CategoriesModel>();
+
                     foreach (var expense in ExpensesList)
                     {
                         if(expense.Id == SelectedRow.Id)
@@ -284,8 +286,12 @@ namespace IncoMasterApp.ViewModels
                             expense.SubmitDate = SelectedRow.SubmitDate;
                         }
 
+                        tempList = ExpensesList;
                         break;
                     }
+
+                    ExpensesList = new ObservableCollection<CategoriesModel>(tempList);
+                    ClearSelectedProperties();
                 }
             }
 
@@ -349,6 +355,14 @@ namespace IncoMasterApp.ViewModels
         private void ClearFilter(object obj)
         {
             ExpensesList = new ObservableCollection<CategoriesModel>(LoggedUser.ExpensesList);
+        }
+
+        private void ClearSelectedProperties()
+        {
+
+            SelectedExpensesType = string.Empty;
+            ExpensesAmount = 0;
+            ExpensesSubmitDate = DateTime.Today.Date.Date;
         }
         #endregion Methods
     }

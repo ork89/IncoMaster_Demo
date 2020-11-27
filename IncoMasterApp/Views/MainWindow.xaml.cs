@@ -18,7 +18,7 @@ namespace IncoMasterApp
             win.Topmost = true;
 
             InitializeComponent();
-            this.DataContext = new MainWindowViewModel();
+            this.DataContext = new MainWindowViewModel(new WindowService());
         }
     }
 }

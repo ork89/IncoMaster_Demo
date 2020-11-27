@@ -1,16 +1,13 @@
-﻿using IncoMasterApp.Interfaces;
-using IncoMasterApp.Views;
+﻿using DotNetCoreGrpcClient;
+using GalaSoft.MvvmLight.Command;
+using HelperClasses;
+using IncoMasterApp.Interfaces;
+using Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Security;
 using System.Windows;
 using System.Windows.Input;
-using DotNetCoreGrpcClient;
-using System.Security;
-using HelperClasses;
-using GalaSoft.MvvmLight.CommandWpf;
-using Models;
-using System.Threading.Tasks;
 
 namespace IncoMasterApp.ViewModels
 {
@@ -18,10 +15,19 @@ namespace IncoMasterApp.ViewModels
     {
         private readonly IWindowService _windowService;
         private readonly Sha256Converter _converter;
+        private readonly static byte[] s_additionalEntropy = { 9, 8, 7, 6, 5 };
+
+
         public LoginViewModel(IWindowService windowService)
         {
             _windowService = windowService;
             _converter = new Sha256Converter();
+
+            if (Properties.Settings.Default.RememberMe)
+            {
+                RememberUserCredentials = true;
+                RetrieveUserCredentials();
+            }
 
             RegisterNewUserCommand = new RelayCommand(RegisterNewUser, param => this.CanExecute);
             LoginCommand = new RelayCommand<Window>(LoginUser);
@@ -36,13 +42,12 @@ namespace IncoMasterApp.ViewModels
         #region Properties
 
         private string _email;
-
         public string Email
         {
             get { return _email; }
-            set 
-            { 
-                if(value != _email)
+            set
+            {
+                if (value != _email)
                 {
                     _email = value;
                     RaisePropertyChanged();
@@ -51,7 +56,6 @@ namespace IncoMasterApp.ViewModels
         }
 
         private SecureString _password;
-
         public SecureString Password
         {
             get { return _password; }
@@ -68,13 +72,12 @@ namespace IncoMasterApp.ViewModels
         public bool ExtraLoginPass { get { return false; } }
 
         private string _errorMessage;
-
         public string ErrorMessage
         {
             get { return _errorMessage; }
-            set 
-            { 
-                if(value != _errorMessage)
+            set
+            {
+                if (value != _errorMessage)
                 {
                     _errorMessage = value;
                     RaisePropertyChanged();
@@ -82,6 +85,7 @@ namespace IncoMasterApp.ViewModels
             }
         }
 
+        public bool RememberUserCredentials { get; set; }
 
         private bool _canExecute = true;
         public bool CanExecute
@@ -109,9 +113,9 @@ namespace IncoMasterApp.ViewModels
         private async void LoginUser(Window win)
         {
             MainWindowViewModel mVm = MainWindowViewModel.Instance;
-
             var loggedUser = new UserModel();
-            loggedUser = await CoreGrpcClient.LoginUser(Email, _converter.HashSecureString(Password));            
+
+            loggedUser = await CoreGrpcClient.LoginUser(Email, _converter.HashSecureString(Password));
 
             if (loggedUser != null && loggedUser.Id != null)
             {
@@ -119,7 +123,16 @@ namespace IncoMasterApp.ViewModels
                 OnPropertyChanged("LoggedUser");
                 mVm.IsProgressbarVisible = true;
 
-                if(win != null) win.Close();
+                if (RememberUserCredentials)
+                    StoreUserCredentials(Email);
+
+                else
+                {
+                    Properties.Settings.Default.RememberMe = false;
+                    Properties.Settings.Default.Save();
+                }
+
+                if (win != null) win.Close();
             }
             else
             {
@@ -132,6 +145,47 @@ namespace IncoMasterApp.ViewModels
             _password = pass.Copy();
             _password.MakeReadOnly();
             RaisePropertyChanged("ExtraLoginPass");
+        }
+
+        private async void StoreUserCredentials(string email)
+        {
+            try
+            {
+                var entropy = Convert.ToBase64String(s_additionalEntropy);
+                var protectedEmail = Email.Protect(entropy);
+
+                using (StreamWriter writer = File.CreateText("data.dat"))
+                {
+                    await writer.WriteAsync(protectedEmail);
+                }
+
+                Properties.Settings.Default.RememberMe = true;
+                Properties.Settings.Default.Save();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        private async void RetrieveUserCredentials()
+        {
+            try
+            {
+                if (File.Exists("data.dat"))
+                {
+                    using (StreamReader reader = new StreamReader("data.dat"))
+                    {
+                        var encryptedFile = await reader.ReadToEndAsync();
+                        var entropy = Convert.ToBase64String(s_additionalEntropy);
+                        Email = encryptedFile.Unprotect(entropy);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
         }
         #endregion
     }

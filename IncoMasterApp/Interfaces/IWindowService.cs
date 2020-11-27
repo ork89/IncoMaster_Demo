@@ -8,5 +8,7 @@ namespace IncoMasterApp.Interfaces
     public interface IWindowService
     {
         void OpenRegistration(RegistrationViewModel vm);
+        void OpenMainWindow(MainWindowViewModel mvm);
+        void OpenLogin(LoginViewModel lvm);
     }
 }

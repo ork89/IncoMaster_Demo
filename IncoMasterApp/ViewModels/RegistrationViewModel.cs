@@ -23,7 +23,6 @@ namespace IncoMasterApp.ViewModels
             _windowService = windowService;
             _converter = new Sha256Converter();
 
-            //RegisterUserCommand = new RelayCommand(RegisterNewUser, param => this.CanExecute);
             RegisterUserCommand = new RelayCommand<Window>(this.RegisterNewUser);
             ClearRegistrationFormCommand = new RelayCommand(ClearFormFields, param => this.CanExecute);
         }
@@ -160,7 +159,6 @@ namespace IncoMasterApp.ViewModels
             {
                 ClearFormFields(result);
                 IsRegistrationSuccess = true;
-                //_windowService.CloseRegistration(new LoginViewModel(new WindowService()));
                 if (win != null) win.Close();
             };
         }

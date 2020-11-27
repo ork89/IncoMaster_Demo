@@ -24,8 +24,6 @@ namespace IncoMasterApp.Views
 
         private void exitBtn_Click(object sender, RoutedEventArgs e)
         {
-            //this.Close();
-            //this.DataContext = new MainWindowViewModel();
             Application.Current.Shutdown();
         }
 

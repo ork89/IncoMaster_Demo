@@ -1,30 +1,31 @@
-﻿using Models;
-using System.Windows.Input;
-using GalaSoft.MvvmLight;
-using DotNetCoreGrpcClient;
+﻿using GalaSoft.MvvmLight.Command;
+using IncoMasterApp.Interfaces;
+using MaterialDesignThemes.Wpf;
+using Models;
 using System;
-using System.Threading.Tasks;
-using System.Windows.Documents;
-using System.Collections.Generic;
-using System.Threading;
 using System.Windows;
+using System.Windows.Input;
 
 namespace IncoMasterApp.ViewModels
 {
     public class MainWindowViewModel : BaseViewModel
     {
-        public static MainWindowViewModel Instance { get; } = new MainWindowViewModel();
+        public static MainWindowViewModel Instance { get; } = new MainWindowViewModel(new WindowService());
+        private readonly IWindowService _windowsService;
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IWindowService windowService)
         {
+            _windowsService = windowService;
+            MainSnackbarMessage = new SnackbarMessage();
+
             SwitchToHomeViewCommand = new RelayCommand(SwitchToHomeView, param => this.CanExecute);
             SwitchToIncomeViewCommand = new RelayCommand(SwitchToIncomeView, param => this.CanExecute);
             SwitchToExpensesViewCommand = new RelayCommand(SwitchToExpensesView, param => this.CanExecute);
             SwitchToSavingsViewCommand = new RelayCommand(SwitchToSavingsView, param => this.CanExecute);
             SwitchToLoansViewCommand = new RelayCommand(SwitchToLoansView, param => this.CanExecute);
-            OpenUserMenuCommand = new RelayCommand(OpenUserMenu, param => this.CanExecute);
-            OpenSettingsMenuCommand = new RelayCommand(OpenSettingsMenu, param => this.CanExecute);
-            LogoutUserCommand = new RelayCommand(LogoutUser, param => this.CanExecute);
+            LogoutUserCommand = new RelayCommand<Window>(LogoutUser);
+            LogoutAndExitCommand = new RelayCommand<Window>(LogoutAndExit, param => this.CanExecute);
+            CloseSnackbarCommand = new RelayCommand(CloseSnackbar, param => this.CanExecute);
         }
 
         #region Commands
@@ -33,9 +34,9 @@ namespace IncoMasterApp.ViewModels
         public ICommand SwitchToExpensesViewCommand { get; set; }
         public ICommand SwitchToSavingsViewCommand { get; set; }
         public ICommand SwitchToLoansViewCommand { get; set; }
-        public ICommand OpenUserMenuCommand { get; set; }
-        public ICommand OpenSettingsMenuCommand { get; set; }
         public ICommand LogoutUserCommand { get; set; }
+        public ICommand LogoutAndExitCommand { get; set; }
+        public ICommand CloseSnackbarCommand { get; set; }
         #endregion Commands
 
         #region Properties
@@ -43,15 +44,15 @@ namespace IncoMasterApp.ViewModels
         private object _selectedViewModel;
         public object SelectedViewModel
         {
-            get 
+            get
             {
                 if (_selectedViewModel == null)
                     _selectedViewModel = new OverviewViewModel();
-                return _selectedViewModel; 
+                return _selectedViewModel;
             }
             set
             {
-                if(value != _selectedViewModel)
+                if (value != _selectedViewModel)
                 {
                     _selectedViewModel = value;
                     RaisePropertyChanged();
@@ -86,6 +87,34 @@ namespace IncoMasterApp.ViewModels
                 }
             }
         }
+        
+        private SnackbarMessage _mainSnackbarMessage;
+        public SnackbarMessage MainSnackbarMessage
+        {
+            get { return _mainSnackbarMessage; }
+            set
+            {
+                if (value != _mainSnackbarMessage)
+                {
+                    _mainSnackbarMessage = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private bool _isSnackbarActive;
+        public bool IsSnackbarActive
+        {
+            get { return _isSnackbarActive; }
+            set
+            {
+                if (value != _isSnackbarActive)
+                {
+                    _isSnackbarActive = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
 
         private bool _canExecute = true;
         public bool CanExecute
@@ -105,20 +134,17 @@ namespace IncoMasterApp.ViewModels
         #endregion Properties
 
         #region CommandMethods
-
-        private void OpenUserMenu(object obj)
+        private void LogoutUser(Window win)
         {
-            throw new NotImplementedException();
+            //TODO: Clear data from LoggedUser and all inherted lists in all UserControls.
+            //      Close MainWindow.
+            Application.Current.Shutdown();
         }
 
-        private void OpenSettingsMenu(object obj)
+        private void LogoutAndExit(object obj)
         {
-            throw new NotImplementedException();
-        }
-
-        private void LogoutUser(object obj)
-        {
-            throw new NotImplementedException();
+            //TODO: Execute LogoutUser
+            Application.Current.Shutdown();
         }
 
         private void SwitchToHomeView(object obj)
@@ -146,6 +172,23 @@ namespace IncoMasterApp.ViewModels
             SelectedViewModel = new LoansViewModel();
         }
 
+        private void DisplaySnackbar(string content)
+        {            
+            MainSnackbarMessage = new SnackbarMessage
+            {
+                ActionContent = "Bye",
+                ActionCommand = CloseSnackbarCommand,
+                Content = $"{content}",
+            };
+
+            IsSnackbarActive = true;
+        }
+
+        private void CloseSnackbar(object obj)
+        {
+            IsSnackbarActive = false;
+        }
         #endregion CommandMethods
-    }
+
+    }    
 }

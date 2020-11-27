@@ -11,28 +11,19 @@ namespace DotNetCoreGrpcClient
     public class CoreGrpcClient
     {
         private static UserModel _loggeduser;
+        private static GrpcChannel _channel = GrpcChannel.ForAddress("https://localhost:5001");
+        private static UserManagementService.UserManagementServiceClient userMngClient =
+            new UserManagementService.UserManagementServiceClient(_channel);
+        private static CategoryManagementService.CategoryManagementServiceClient categoryMngClient =
+            new CategoryManagementService.CategoryManagementServiceClient(_channel);
 
-        public CoreGrpcClient() { }
-
-        private static UserModel InitializeUserLists(UserModel loggeduser)
+        public CoreGrpcClient()
         {
-            loggeduser.Income = new List<string>();
-            loggeduser.Expenses = new List<string>();
-            loggeduser.Savings = new List<string>();
-            loggeduser.Loans = new List<string>();
 
-            loggeduser.IncomeList = new List<CategoriesModel>();
-            loggeduser.ExpensesList = new List<CategoriesModel>();
-            loggeduser.SavingsList = new List<CategoriesModel>();
-            loggeduser.LoansList = new List<CategoriesModel>();
-
-            return loggeduser;
         }
 
         public static async Task<UserModel> LoginUser(string email, string password)
         {
-            using var channel = GrpcChannel.ForAddress("https://localhost:5001");
-            var userMngClient = new UserManagementService.UserManagementServiceClient(channel);
             var response = await userMngClient.LoginUserAsync(new LoginUserRequest { Email = email, Password = password });
 
             return GetLoggedUserDetails(response.User);
@@ -111,11 +102,23 @@ namespace DotNetCoreGrpcClient
             return _loggeduser;
         }
 
+        private static UserModel InitializeUserLists(UserModel loggeduser)
+        {
+            loggeduser.Income = new List<string>();
+            loggeduser.Expenses = new List<string>();
+            loggeduser.Savings = new List<string>();
+            loggeduser.Loans = new List<string>();
+
+            loggeduser.IncomeList = new List<CategoriesModel>();
+            loggeduser.ExpensesList = new List<CategoriesModel>();
+            loggeduser.SavingsList = new List<CategoriesModel>();
+            loggeduser.LoansList = new List<CategoriesModel>();
+
+            return loggeduser;
+        }
+
         public static async Task<string> AddOrUpdateUser(UserModel newUser)
         {
-            using var channel = GrpcChannel.ForAddress("https://localhost:5001");
-            var userMngClient = new UserManagementService.UserManagementServiceClient(channel);
-
             var replay = await userMngClient.AddOrUpdateUserAsync(new AddOrUpdateUserRequest
             {
                 User = new User
@@ -134,10 +137,6 @@ namespace DotNetCoreGrpcClient
 
         public static async Task<string> AddCategory(CategoriesModel category, string userId)
         {
-            using var channel = GrpcChannel.ForAddress("https://localhost:5001");
-            var categoryMngClient = new CategoryManagementService.CategoryManagementServiceClient(channel);
-            var userMngClient = new UserManagementService.UserManagementServiceClient(channel);
-
             var categoryReplay = await categoryMngClient.AddNewCategoryAsync(new AddNewCategoryRequest
             {
                 Category = new SingleCategory
@@ -164,9 +163,6 @@ namespace DotNetCoreGrpcClient
 
         public static async Task<string> UpdateCategory(CategoriesModel category, string id)
         {
-            using var channel = GrpcChannel.ForAddress("https://localhost:5001");
-            var categoryMngClient = new CategoryManagementService.CategoryManagementServiceClient(channel);
-
             var replay = await categoryMngClient.UpdateCategoryAsync(new UpdateCategoryRequest
             {
                 Category = new SingleCategory
@@ -184,10 +180,6 @@ namespace DotNetCoreGrpcClient
 
         public static async Task<string> DeleteCategory(string categoryId, string CategoryType, string userId)
         {
-            using var channel = GrpcChannel.ForAddress("https://localhost:5001");
-            var categoryMngClient = new CategoryManagementService.CategoryManagementServiceClient(channel);
-            var userMngClient = new UserManagementService.UserManagementServiceClient(channel);
-
             var categoryReplay = await categoryMngClient.DeleteCategoryAsync(new DeleteCategoryRequest { Id = categoryId });
 
             if (!string.IsNullOrEmpty(categoryReplay.Error))

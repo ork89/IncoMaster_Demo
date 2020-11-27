@@ -25,7 +25,7 @@ namespace IncoMasterApp.ViewModels
                 InitSavingsList(LoggedUser.SavingsList);
 
             InitSavingsTypesList();
-            SavingsSubmitDate = DateTime.Today.Date;
+            SavingsSubmitDate = DateTime.Today.Date.Date;
             SelectedMonth = DateTime.Today.Month;
             SelectedYear = DateTime.Today.Year;
 
@@ -186,8 +186,6 @@ namespace IncoMasterApp.ViewModels
         public List<int> Months { get { return base.MonthsList; } }
         public List<int> Years { get { return base.YearsList; } }
 
-
-        //public event EventHandler Close;
         private bool _canExecute = true;
         public bool CanExecute
         {
@@ -273,7 +271,8 @@ namespace IncoMasterApp.ViewModels
                 if (string.IsNullOrEmpty(result))
                 {
                     DisplaySnackbar("Updated.");
-                    
+                    var tempList = new ObservableCollection<CategoriesModel>();
+
                     foreach (var savings in SavingsList)
                     {
                         if (savings.Id == SelectedRow.Id)
@@ -284,13 +283,14 @@ namespace IncoMasterApp.ViewModels
 
                             RaisePropertyChanged();
                         }
-
+                        tempList = SavingsList;
                         break;
                     }
+
+                    SavingsList = new ObservableCollection<CategoriesModel>(tempList);
+                    ClearSelectedProperties();
                 }
             }
-
-            //Close?.Invoke(this, EventArgs.Empty);
         }
 
         private async void DeleteSavings(object obj)
@@ -345,6 +345,14 @@ namespace IncoMasterApp.ViewModels
         private void ClearFilter(object obj)
         {
             SavingsList = new ObservableCollection<CategoriesModel>(LoggedUser.SavingsList);
+        }
+
+        private void ClearSelectedProperties()
+        {
+
+            SelectedSavingsType = string.Empty;
+            SavingsAmount = 0;
+            SavingsSubmitDate = DateTime.Today.Date.Date;
         }
         #endregion Methods
     }
